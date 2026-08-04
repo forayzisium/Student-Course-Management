@@ -11,7 +11,6 @@ import {
   FileText,
   User,
   Search,
-  Filter,
   Bell,
   ChevronRight,
   Sparkles,
@@ -22,11 +21,7 @@ import {
   List,
   X,
   MapPin,
-  ArrowUpRight,
   Check,
-  MessageSquare,
-  BookMarked,
-  SlidersHorizontal,
   FolderOpen
 } from 'lucide-react';
 
