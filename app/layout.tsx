@@ -1,24 +1,21 @@
-import Footer from "@/components/Footer";
+import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+export const metadata: Metadata = {
+    title: "SCMS",
+    description: "Student Course Management System",
+};
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className="bg-slate-50">
+    return (
+        <html lang="en">
 
-        <Navbar />
-
-        <main className="min-h-screen">
-          {children}
-        </main>
-
-        <Footer />
-      </body>
-    </html>
-  );
+            <body>
+                {children}
+            </body>
+        </html>
+    );
 }
