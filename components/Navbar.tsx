@@ -6,6 +6,8 @@ import { useState } from "react";
 const links = [
     { name: "Home", href: "/" },
     { name: "Courses", href: "/courses" },
+    { name: "About Us", href: "/about" },
+    { name: "Contact", href: "/contact" }
 ];
 
 export default function Navbar() {
@@ -13,54 +15,46 @@ export default function Navbar() {
 
     return (
         <header className="sticky top-0 z-50">
-            <nav className="mx-auto border border-white/20 bg-white/70 backdrop-blur-xl shadow-xl">
-                <div className="flex h-16 items-center justify-between px-6">
+            <nav className="mx-auto bg-[#faf9f6]/10 backdrop-blur-xl shadow-sm">
+                <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
 
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold shadow-lg">
-                            S
-                        </div>
-
+                    <Link href="/" className="flex items-center">
                         <div>
-                            <h1 className="text-lg font-bold text-gray-900">
-                                SCMS
-                            </h1>
-
-                            <p className="text-xs text-gray-500">
-                                Student Course Management
+                            <p className="text-xl font-normal tracking-tight text-[#333333] font-serif">
+                                SC<span className="text-[#B45A2A]">M</span>
                             </p>
                         </div>
                     </Link>
 
                     {/* Desktop Menu */}
-                    <div className="hidden lg:flex items-center gap-8">
+                    <div className="hidden lg:flex items-center gap-8 font-inter">
                         {links.map((item) => (
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className="group relative text-gray-700 font-medium transition"
+                                className="group relative text-[#45413D] font-medium transition-colors duration-200 hover:text-[#B84A24]"
                             >
                                 {item.name}
 
-                                <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                                <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-[#B84A24] transition-all duration-300 group-hover:w-full"></span>
                             </Link>
                         ))}
                     </div>
 
                     {/* Buttons */}
-                    <div className="hidden lg:flex items-center gap-3">
+                    <div className="hidden lg:flex items-center gap-3 ">
 
                         <Link
                             href="/login"
-                            className="rounded-xl border border-blue-600 px-5 py-2 font-medium text-blue-600 transition hover:bg-blue-50"
+                            className="rounded-xl border border-black px-5 py-2 font-sm text-black transition-colors duration-200 hover:bg-[#B84A24] hover:text-white hover:border-[#B84A24]"
                         >
                             Login
                         </Link>
 
                         <Link
                             href="/register"
-                            className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2 font-medium text-white shadow-lg transition hover:scale-105"
+                            className="rounded-xl bg-black px-5 py-2 font-sm text-white transition-colors duration-200 hover:bg-[#B84A24] hover:text-white"
                         >
                             Register
                         </Link>
@@ -102,23 +96,24 @@ export default function Navbar() {
                                 key={item.name}
                                 href={item.href}
                                 onClick={() => setOpen(false)}
-                                className="font-medium text-gray-700 hover:text-blue-600"
+                                className="font-medium text-[#45413D] transition-colors font-inter duration-200 hover:text-[#B84A24]"
                             >
                                 {item.name}
                             </Link>
                         ))}
 
-                        <div className="flex gap-3 pt-4">
+                        <div className="flex gap-3 pt-4 font-inter">
                             <Link
                                 href="/login"
-                                className="flex-1 rounded-lg border border-blue-600 py-2 text-center font-medium text-blue-600"
+                                className="flex-1 rounded-lg text-center border border-black px-5 py-2 font-sm text-black transition-colors duration-200 hover:bg-[#B84A24] hover:text-white hover:border-[#B84A24]"
                             >
+
                                 Login
                             </Link>
 
                             <Link
                                 href="/register"
-                                className="flex-1 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 py-2 text-center font-medium text-white"
+                                className="flex-1 rounded-lg text-center bg-black px-5 py-2 font-sm text-white transition-colors duration-200 hover:bg-[#B84A24] hover:text-white"
                             >
                                 Register
                             </Link>

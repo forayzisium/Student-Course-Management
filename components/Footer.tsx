@@ -4,7 +4,7 @@ export default function Footer() {
 
     return (
         <footer className="mt-20 px-4 pb-4">
-            <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-slate-950 text-white">
+            <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-[#171510] text-white">
 
                 {/* Main Footer */}
                 <div className="grid gap-12 px-6 py-12 sm:px-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:px-12 lg:py-16">
@@ -13,7 +13,7 @@ export default function Footer() {
                     <div>
                         <Link href="/" className="inline-flex items-center gap-3">
                             {/* Logo Icon */}
-                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/20">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#45413D] shadow-lg shadow-dark/10">
                                 <svg
                                     viewBox="0 0 24 24"
                                     fill="none"
@@ -36,29 +36,31 @@ export default function Footer() {
                             </div>
 
                             <div>
-                                <h2 className="text-xl font-bold tracking-tight">SCMS</h2>
+                                <p className="text-xl font-normal tracking-tight text-white/90 font-serif">
+                                    SC<span className="text-[#B45A2A]">M</span>
+                                </p>
 
-                                <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-slate-400">
+                                <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-[#F2E9D8] font-inter">
                                     Course Management
                                 </p>
                             </div>
                         </Link>
 
-                        <p className="mt-5 max-w-sm text-sm leading-6 text-slate-400">
+                        <p className="mt-5 max-w-sm text-sm leading-6 text-[#F2E9D8] font-inter">
                             A simple and modern platform for students and teachers to
                             manage courses, learning activities, and academic information
                             in one place.
                         </p>
 
                         {/* Status */}
-                        <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900 px-4 py-2">
+                        <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900 px-4 py-2 font-inter">
                             <span className="relative flex h-2 w-2">
                                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
 
                                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
                             </span>
 
-                            <span className="text-xs font-medium text-slate-300">
+                            <span className="text-xs font-medium text-[#F2E9D8]">
                                 System Online
                             </span>
                         </div>
@@ -66,11 +68,11 @@ export default function Footer() {
 
                     {/* Account */}
                     <div>
-                        <h3 className="mb-5 text-sm font-semibold text-white">
+                        <h3 className="mb-5 text-sm font-semibold text-[#F2E9D8] font-inter">
                             Account
                         </h3>
 
-                        <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-3 font-inter">
                             <FooterLink href="/login">Sign In</FooterLink>
 
                             <FooterLink href="/register">
@@ -82,11 +84,11 @@ export default function Footer() {
 
                     {/* Support */}
                     <div>
-                        <h3 className="mb-5 text-sm font-semibold text-white">
+                        <h3 className="mb-5 text-sm font-semibold text-[#F2E9D8] font-inter">
                             Support
                         </h3>
 
-                        <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-3 font-inter">
                             <FooterLink href="/about">About SCMS</FooterLink>
 
                             <FooterLink href="/contact">Contact</FooterLink>
@@ -100,15 +102,15 @@ export default function Footer() {
                 <div className="mx-6 border-t border-slate-800 sm:mx-10 lg:mx-12" />
 
                 {/* Bottom Footer */}
-                <div className="flex flex-col gap-5 px-6 py-6 sm:px-10 md:flex-row md:items-center md:justify-between lg:px-12">
+                <div className="flex flex-col gap-5 px-6 py-6 font-inter sm:px-10 md:flex-row md:items-center md:justify-between lg:px-12">
 
                     {/* Copyright */}
-                    <p className="text-center text-xs text-slate-500 md:text-left">
+                    <p className="text-center text-xs text-[#F2E9D8] md:text-left">
                         © 2026 SCMS. All rights reserved.
                     </p>
 
                     {/* Made for Education */}
-                    <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
+                    <div className="flex items-center justify-center gap-2 text-xs text-[#F2E9D8]">
                         <span>Built for</span>
 
                         <span className="rounded-full bg-indigo-500/10 px-3 py-1 font-medium text-indigo-400">

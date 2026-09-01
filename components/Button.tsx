@@ -23,7 +23,7 @@ interface ButtonProps
 
 export default function Button({
     children,
-    variant = "primary",
+    variant = "secondary",
     size = "md",
     loading = false,
     fullWidth = false,
