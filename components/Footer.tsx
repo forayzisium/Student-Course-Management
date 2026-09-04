@@ -3,8 +3,8 @@ import Link from "next/link";
 export default function Footer() {
 
     return (
-        <footer className="mt-20 px-4 pb-4">
-            <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-[#171510] text-white">
+        <footer className="mt-20 w-full">
+            <div className="w-full overflow-hidden bg-[#171510] text-white">
 
                 {/* Main Footer */}
                 <div className="grid gap-12 px-6 py-12 sm:px-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:px-12 lg:py-16">
