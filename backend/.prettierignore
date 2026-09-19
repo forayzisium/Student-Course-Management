@@ -1,0 +1,14 @@
+node_modules/
+.next/
+dist/
+build/
+out/
+.agents/
+*.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+*.tsbuildinfo
+.env
+.env.*
+skills-lock.json
