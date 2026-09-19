@@ -125,6 +125,40 @@ app.get("/", (_req, res) => {
   });
 });
 
+function safeDatabaseError(error: unknown) {
+  const value = error as { name?: unknown; code?: unknown; message?: unknown };
+  let message =
+    typeof value?.message === "string"
+      ? value.message
+      : "Database connection failed without error details";
+
+  message = message.replace(/(?:mysql|mariadb):\/\/[^\s"'<>]+/gi, "[REDACTED]");
+
+  for (const key of [
+    "DATABASE_URL",
+    "DB_HOST",
+    "DB_PORT",
+    "DB_USER",
+    "DB_PASSWORD",
+    "DB_NAME",
+    "JWT_SECRET",
+  ]) {
+    const configuredValue = process.env[key];
+    if (configuredValue && configuredValue.length >= 3) {
+      message = message.split(configuredValue).join("[REDACTED]");
+    }
+  }
+
+  return {
+    name: typeof value?.name === "string" ? value.name : "UnknownError",
+    code:
+      typeof value?.code === "string" || typeof value?.code === "number"
+        ? value.code
+        : "UNKNOWN",
+    message: message.replace(/\s+/g, " ").slice(0, 500),
+  };
+}
+
 app.get("/api/health/db", async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -134,7 +168,7 @@ app.get("/api/health/db", async (_req, res) => {
       message: "Database connection is working",
     });
   } catch (error) {
-    console.error("Database connection failed:", error);
+    console.error("Database connection failed:", safeDatabaseError(error));
 
     res.status(500).json({
       success: false,
