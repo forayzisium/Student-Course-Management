@@ -276,60 +276,71 @@ export async function getMyTeacherStudents(userId: number) {
 
   const studentIds = students.map((s) => s.id);
 
-  const [attendanceRecords, gradeRecords, assignmentRecords] =
-    await Promise.all([
-      prisma.attendance.findMany({
-        where: {
-          studentId: {
-            in: studentIds,
-          },
-          courseId: {
-            in: courseIds,
-          },
+console.log("Teacher students: loading attendance");
+
+const attendanceRecords = await prisma.attendance.findMany({
+  where: {
+    studentId: {
+      in: studentIds,
+    },
+    courseId: {
+      in: courseIds,
+    },
+  },
+  select: {
+    studentId: true,
+    status: true,
+  },
+});
+
+console.log("Teacher students: attendance OK");
+
+console.log("Teacher students: loading grades");
+
+const gradeRecords = await prisma.grade.findMany({
+  where: {
+    studentId: {
+      in: studentIds,
+    },
+    courseId: {
+      in: courseIds,
+    },
+  },
+  select: {
+    studentId: true,
+    total: true,
+  },
+});
+
+console.log("Teacher students: grades OK");
+
+console.log("Teacher students: loading assignments");
+
+const assignmentRecords = await prisma.assignment.findMany({
+  where: {
+    courseId: {
+      in: courseIds,
+    },
+    status: "ACTIVE",
+  },
+  select: {
+    id: true,
+    courseId: true,
+    submissions: {
+      where: {
+        studentId: {
+          in: studentIds,
         },
-        select: {
-          studentId: true,
-          status: true,
-        },
-      }),
-      prisma.grade.findMany({
-        where: {
-          studentId: {
-            in: studentIds,
-          },
-          courseId: {
-            in: courseIds,
-          },
-        },
-        select: {
-          studentId: true,
-          total: true,
-        },
-      }),
-      prisma.assignment.findMany({
-        where: {
-          courseId: {
-            in: courseIds,
-          },
-          status: "ACTIVE",
-        },
-        select: {
-          id: true,
-          courseId: true,
-          submissions: {
-            where: {
-              studentId: {
-                in: studentIds,
-              },
-            },
-            select: {
-              studentId: true,
-              status: true,
-            },
-          },
-        },
-      }),
-    ]);
+      },
+      select: {
+        studentId: true,
+        status: true,
+      },
+    },
+  },
+});
+
+console.log("Teacher students: assignments OK");
 
   const attendanceMap = new Map<number, { total: number; present: number }>();
   const gradeMap = new Map<number, number[]>();
