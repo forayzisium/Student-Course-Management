@@ -183,9 +183,12 @@ export default function StudentCourses() {
     }
   };
 
-  const fetchAvailableCourses = async () => {
+  const fetchAvailableCourses = async (showLoading = true) => {
     try {
-      setLoadingAvailable(true);
+      if (showLoading) {
+        setLoadingAvailable(true);
+      }
+
       setError("");
 
       const token = getToken();
@@ -213,7 +216,9 @@ export default function StudentCourses() {
         err instanceof Error ? err.message : "Failed to load available courses",
       );
     } finally {
-      setLoadingAvailable(false);
+      if (showLoading) {
+        setLoadingAvailable(false);
+      }
     }
   };
   const fetchEnrollmentHistory = async () => {
@@ -247,10 +252,16 @@ export default function StudentCourses() {
   };
 
   useRealtimeRefresh(async () => {
-    await fetchMyCourses();
-    if (activeTab === "browse") await fetchAvailableCourses();
-    if (activeTab === "history") await fetchEnrollmentHistory();
-  });
+  await fetchMyCourses();
+
+  if (activeTab === "browse") {
+    await fetchAvailableCourses(false);
+  }
+
+  if (activeTab === "history") {
+    await fetchEnrollmentHistory();
+  }
+});
 
   const loadInitialCourses = useEffectEvent(() => {
     void fetchStudentProfile();
@@ -351,22 +362,20 @@ export default function StudentCourses() {
         <div className="mb-7 flex flex-wrap gap-2 rounded-xl bg-white p-2 shadow-sm">
           <button
             onClick={() => setActiveTab("my-courses")}
-            className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
-              activeTab === "my-courses"
-                ? "bg-[#B45A2A] text-white"
-                : "text-slate-600 hover:bg-slate-100"
-            }`}
+            className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${activeTab === "my-courses"
+              ? "bg-[#B45A2A] text-white"
+              : "text-slate-600 hover:bg-slate-100"
+              }`}
           >
             My Courses
           </button>
 
           <button
             onClick={handleBrowseCourses}
-            className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
-              activeTab === "browse"
-                ? "bg-[#B45A2A] text-white"
-                : "text-slate-600 hover:bg-slate-100"
-            }`}
+            className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${activeTab === "browse"
+              ? "bg-[#B45A2A] text-white"
+              : "text-slate-600 hover:bg-slate-100"
+              }`}
           >
             Browse Courses
           </button>
@@ -376,11 +385,10 @@ export default function StudentCourses() {
               setActiveTab("history");
               fetchEnrollmentHistory();
             }}
-            className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
-              activeTab === "history"
-                ? "bg-[#B45A2A] text-white"
-                : "text-slate-600 hover:bg-slate-100"
-            }`}
+            className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${activeTab === "history"
+              ? "bg-[#B45A2A] text-white"
+              : "text-slate-600 hover:bg-slate-100"
+              }`}
           >
             Enrollment History
           </button>
@@ -556,14 +564,13 @@ export default function StudentCourses() {
                               loadingProfile ||
                               !studentProfileId
                             }
-                            className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition ${
-                              isEnrolled ||
+                            className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition ${isEnrolled ||
                               isEnrolling ||
                               loadingProfile ||
                               !studentProfileId
-                                ? "cursor-not-allowed opacity-50"
-                                : ""
-                            }`}
+                              ? "cursor-not-allowed opacity-50"
+                              : ""
+                              }`}
                           >
                             {loadingProfile
                               ? "Loading..."
@@ -732,11 +739,10 @@ export default function StudentCourses() {
 
                           <td className="px-6 py-5">
                             <span
-                              className={`rounded-full px-3 py-1 text-xs font-medium ${
-                                item.status === "ACTIVE"
-                                  ? "bg-green-50 text-green-700"
-                                  : "bg-slate-100 text-slate-600"
-                              }`}
+                              className={`rounded-full px-3 py-1 text-xs font-medium ${item.status === "ACTIVE"
+                                ? "bg-green-50 text-green-700"
+                                : "bg-slate-100 text-slate-600"
+                                }`}
                             >
                               {item.status}
                             </span>
