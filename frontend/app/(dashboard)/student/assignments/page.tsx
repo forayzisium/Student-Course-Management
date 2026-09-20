@@ -182,9 +182,12 @@ function StudentAssignmentsContent() {
   );
 
 
-  const loadAssignments = useCallback(async () => {
+  const loadAssignments = useCallback(async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
+
       setError("");
 
       const token = localStorage.getItem("scm_token");
@@ -214,12 +217,14 @@ function StudentAssignmentsContent() {
         err instanceof Error ? err.message : "Failed to load assignments.",
       );
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   }, [mapAssignment]);
 
   useRealtimeRefresh(async () => {
-    await loadAssignments();
+    await loadAssignments(false);
   });
 
 
@@ -660,11 +665,10 @@ function StudentAssignmentsContent() {
                 key={filter}
                 type="button"
                 onClick={() => setActiveFilter(filter)}
-                className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
-                  activeFilter === filter
-                    ? "bg-[#B45A2A] text-white"
-                    : "bg-white text-slate-600 shadow-sm hover:bg-slate-50"
-                }`}
+                className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${activeFilter === filter
+                  ? "bg-[#B45A2A] text-white"
+                  : "bg-white text-slate-600 shadow-sm hover:bg-slate-50"
+                  }`}
               >
                 {filter}
               </button>
@@ -705,13 +709,12 @@ function StudentAssignmentsContent() {
                     </div>
 
                     <span
-                      className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
-                        assignment.status === "Pending"
-                          ? "bg-amber-50 text-amber-700"
-                          : assignment.status === "Submitted"
-                            ? "bg-blue-50 text-blue-700"
-                            : "bg-green-50 text-green-700"
-                      }`}
+                      className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${assignment.status === "Pending"
+                        ? "bg-amber-50 text-amber-700"
+                        : assignment.status === "Submitted"
+                          ? "bg-blue-50 text-blue-700"
+                          : "bg-green-50 text-green-700"
+                        }`}
                     >
                       {assignment.status}
                     </span>
@@ -875,24 +878,21 @@ function StudentAssignmentsContent() {
                     {selectedAssignment.status === "Pending" && (
                       <div className="mt-5">
                         <div
-                          className={`rounded-xl border p-5 ${
-                            isPastDue
-                              ? "border-red-100 bg-red-50"
-                              : "border-amber-100 bg-amber-50"
-                          }`}
+                          className={`rounded-xl border p-5 ${isPastDue
+                            ? "border-red-100 bg-red-50"
+                            : "border-amber-100 bg-amber-50"
+                            }`}
                         >
                           <p
-                            className={`font-semibold ${
-                              isPastDue ? "text-red-800" : "text-amber-800"
-                            }`}
+                            className={`font-semibold ${isPastDue ? "text-red-800" : "text-amber-800"
+                              }`}
                           >
                             {isPastDue ? "Deadline Passed" : "Ready to Submit"}
                           </p>
 
                           <p
-                            className={`mt-2 text-sm leading-6 ${
-                              isPastDue ? "text-red-700" : "text-amber-700"
-                            }`}
+                            className={`mt-2 text-sm leading-6 ${isPastDue ? "text-red-700" : "text-amber-700"
+                              }`}
                           >
                             {isPastDue
                               ? "The assignment deadline has passed, so the backend will not accept a new submission."
@@ -956,11 +956,10 @@ function StudentAssignmentsContent() {
                           type="button"
                           disabled={submitting || isPastDue || !selectedFile}
                           onClick={() => void handleSubmit()}
-                          className={`mt-4 w-full rounded-lg px-4 py-3 text-sm font-semibold text-white transition ${
-                            submitting || isPastDue || !selectedFile
-                              ? "cursor-not-allowed bg-slate-300"
-                              : "bg-[#111827] hover:bg-slate-800"
-                          }`}
+                          className={`mt-4 w-full rounded-lg px-4 py-3 text-sm font-semibold text-white transition ${submitting || isPastDue || !selectedFile
+                            ? "cursor-not-allowed bg-slate-300"
+                            : "bg-[#111827] hover:bg-slate-800"
+                            }`}
                         >
                           {submitting
                             ? "Uploading & Submitting..."

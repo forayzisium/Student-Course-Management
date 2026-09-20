@@ -201,9 +201,12 @@ export default function PayFeesPage() {
   };
 
 
-  const loadPayments = async () => {
+  const loadPayments = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
+
       setError("");
 
       const token = localStorage.getItem("scm_token");
@@ -250,14 +253,16 @@ export default function PayFeesPage() {
         err instanceof Error ? err.message : "Failed to load payment history.",
       );
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   };
 
   useRealtimeRefresh(async () => {
     if (showPaymentModal || submitting) return;
     await loadFees();
-    await loadPayments();
+    await loadPayments(false);
   });
 
 
@@ -829,14 +834,14 @@ export default function PayFeesPage() {
                       type="button"
                       onClick={() => toggleFee(fee.id)}
                       className={`flex w-full items-center gap-4 rounded-xl border p-4 text-left transition ${selected
-                          ? "border-slate-300 bg-[#B45A2A]/5"
-                          : "border-slate-100 hover:bg-slate-50"
+                        ? "border-slate-300 bg-[#B45A2A]/5"
+                        : "border-slate-100 hover:bg-slate-50"
                         }`}
                     >
                       <div
                         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${selected
-                            ? "border-[#B45A2A] bg-[#B45A2A] text-white"
-                            : "border-slate-300"
+                          ? "border-[#B45A2A] bg-[#B45A2A] text-white"
+                          : "border-slate-300"
                           }`}
                       >
                         {selected && (
@@ -906,8 +911,8 @@ export default function PayFeesPage() {
                 type="button"
                 onClick={() => setPaymentMethod("bKash")}
                 className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${paymentMethod === "bKash"
-                    ? "border-slate-300 bg-[#B45A2A]/5"
-                    : "border-slate-100 hover:bg-slate-50"
+                  ? "border-slate-300 bg-[#B45A2A]/5"
+                  : "border-slate-100 hover:bg-slate-50"
                   }`}
               >
                 <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-[#E2136E]">
@@ -926,8 +931,8 @@ export default function PayFeesPage() {
 
                 <div
                   className={`h-4 w-4 rounded-full border ${paymentMethod === "bKash"
-                      ? "border-slate-100 bg-[#B45A2A]"
-                      : "border-slate-300"
+                    ? "border-slate-100 bg-[#B45A2A]"
+                    : "border-slate-300"
                     }`}
                 />
               </button>
@@ -937,8 +942,8 @@ export default function PayFeesPage() {
                 type="button"
                 onClick={() => setPaymentMethod("Nagad")}
                 className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${paymentMethod === "Nagad"
-                    ? "border-slate-300 bg-[#B45A2A]/5"
-                    : "border-slate-100 hover:bg-slate-50"
+                  ? "border-slate-300 bg-[#B45A2A]/5"
+                  : "border-slate-100 hover:bg-slate-50"
                   }`}
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white p-1">
@@ -957,8 +962,8 @@ export default function PayFeesPage() {
 
                 <div
                   className={`h-4 w-4 rounded-full border ${paymentMethod === "Nagad"
-                      ? "border-slate-100 bg-[#B45A2A]"
-                      : "border-slate-300"
+                    ? "border-slate-100 bg-[#B45A2A]"
+                    : "border-slate-300"
                     }`}
                 />
               </button>
@@ -968,8 +973,8 @@ export default function PayFeesPage() {
                 type="button"
                 onClick={() => setPaymentMethod("Card")}
                 className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${paymentMethod === "Card"
-                    ? "border-slate-300 bg-[#B45A2A]/5"
-                    : "border-slate-100 hover:bg-slate-50"
+                  ? "border-slate-300 bg-[#B45A2A]/5"
+                  : "border-slate-100 hover:bg-slate-50"
                   }`}
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white p-1">
@@ -988,8 +993,8 @@ export default function PayFeesPage() {
 
                 <div
                   className={`h-4 w-4 rounded-full border ${paymentMethod === "Card"
-                      ? "border-slate-100 bg-[#B45A2A]"
-                      : "border-slate-300"
+                    ? "border-slate-100 bg-[#B45A2A]"
+                    : "border-slate-300"
                     }`}
                 />
               </button>
@@ -1113,10 +1118,10 @@ export default function PayFeesPage() {
                         <td className="py-5 text-right">
                           <span
                             className={`rounded-full px-3 py-1 text-xs font-semibold ${payment.status === "Paid"
-                                ? "bg-green-50 text-green-600"
-                                : payment.status === "Failed"
-                                  ? "bg-red-50 text-red-600"
-                                  : "bg-yellow-50 text-yellow-600"
+                              ? "bg-green-50 text-green-600"
+                              : payment.status === "Failed"
+                                ? "bg-red-50 text-red-600"
+                                : "bg-yellow-50 text-yellow-600"
                               }`}
                           >
                             {payment.status}
@@ -1148,10 +1153,10 @@ export default function PayFeesPage() {
 
                       <span
                         className={`rounded-full px-2.5 py-1 text-xs font-semibold ${payment.status === "Paid"
-                            ? "bg-green-50 text-green-600"
-                            : payment.status === "Failed"
-                              ? "bg-red-50 text-red-600"
-                              : "bg-yellow-50 text-yellow-600"
+                          ? "bg-green-50 text-green-600"
+                          : payment.status === "Failed"
+                            ? "bg-red-50 text-red-600"
+                            : "bg-yellow-50 text-yellow-600"
                           }`}
                       >
                         {payment.status}
