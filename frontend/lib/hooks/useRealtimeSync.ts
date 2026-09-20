@@ -40,18 +40,25 @@ export function useRealtimeSync() {
     let reconnect: ReturnType<typeof setTimeout>;
     let debounce: ReturnType<typeof setTimeout>;
     let dirty = false;
+
     const refresh = () => {
-      dirty = true;
       clearTimeout(debounce);
+
+      if (document.visibilityState !== "visible") {
+        dirty = true;
+        return;
+      }
+
       debounce = setTimeout(() => {
-        if (document.visibilityState === "visible") {
-          dirty = false;
-          window.dispatchEvent(new Event(STUDENT_REFRESH));
-        }
+        dirty = false;
+        window.dispatchEvent(new Event(STUDENT_REFRESH));
       }, 300);
     };
+
     const visible = () => {
-      if (dirty || document.visibilityState === "visible") refresh();
+      if (document.visibilityState === "visible" && dirty) {
+        refresh();
+      }
     };
     let connectedBefore = false;
     let retry = 1000;
