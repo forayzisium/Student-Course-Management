@@ -152,36 +152,39 @@ export default function StudentCourses() {
     }
   };
 
-  const fetchMyCourses = async () => {
-    try {
+  const fetchMyCourses = async (showLoading = true) => {
+  try {
+    if (showLoading) {
       setLoadingMyCourses(true);
+    }
 
-      const token = getToken();
+    const token = getToken();
 
-      if (!token) {
-        throw new Error("Authentication token not found");
-      }
+    if (!token) {
+      throw new Error("Authentication token not found");
+    }
 
-      const response = await apiFetch<EnrollmentResponse<BackendCourse>>(
-        "/enrollments/my-courses",
-        {
-          token,
-        },
-      );
+    const response = await apiFetch<EnrollmentResponse<BackendCourse>>(
+      "/enrollments/my-courses",
+      {
+        token,
+      },
+    );
 
-      const courses = getEnrolledCourses(response);
+    const courses = getEnrolledCourses(response);
 
-      setMyCourses(courses.map((course) => mapCourse(course, true)));
-
-      setEnrolledCourseIds(courses.map((course) => course.id));
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to load your courses",
-      );
-    } finally {
+    setMyCourses(courses.map((course) => mapCourse(course, true)));
+    setEnrolledCourseIds(courses.map((course) => course.id));
+  } catch (err) {
+    setError(
+      err instanceof Error ? err.message : "Failed to load your courses",
+    );
+  } finally {
+    if (showLoading) {
       setLoadingMyCourses(false);
     }
-  };
+  }
+};
 
   const fetchAvailableCourses = async (showLoading = true) => {
     try {
@@ -251,8 +254,8 @@ export default function StudentCourses() {
     }
   };
 
-  useRealtimeRefresh(async () => {
-  await fetchMyCourses();
+useRealtimeRefresh(async () => {
+  await fetchMyCourses(false);
 
   if (activeTab === "browse") {
     await fetchAvailableCourses(false);
