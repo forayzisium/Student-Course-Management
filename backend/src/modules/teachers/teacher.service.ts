@@ -163,6 +163,8 @@ export async function getMyTeacherProfile(userId: number) {
   });
 }
 export async function getMyTeacherStudents(userId: number) {
+  console.log("Teacher students: loading teacher");
+
   const teacher = await prisma.user.findFirst({
     where: {
       id: userId,
@@ -176,7 +178,7 @@ export async function getMyTeacherStudents(userId: number) {
       },
     },
   });
-
+  console.log("Teacher students: teacher OK");
   if (!teacher) {
     throw new Error("Teacher not found");
   }
@@ -186,7 +188,7 @@ export async function getMyTeacherStudents(userId: number) {
   if (courseIds.length === 0) {
     return [];
   }
-
+console.log("Teacher students: loading enrollments");
   const enrollments = await prisma.enrollment.findMany({
     where: {
       courseId: {
@@ -217,7 +219,7 @@ export async function getMyTeacherStudents(userId: number) {
       },
     },
   });
-
+console.log("Teacher students: enrollments OK");
   const studentMap = new Map<
     number,
     {
