@@ -188,7 +188,119 @@ export async function getMyTeacherStudents(userId: number) {
   if (courseIds.length === 0) {
     return [];
   }
-console.log("Teacher students: loading enrollments");
+  console.log("Teacher students: loading enrollments");
+  console.log("Teacher students: test enrollment base");
+
+  await prisma.enrollment.findMany({
+    where: {
+      courseId: {
+        in: courseIds,
+      },
+      status: "ACTIVE",
+    },
+    select: {
+      id: true,
+      studentId: true,
+      courseId: true,
+      status: true,
+    },
+  });
+
+  console.log("Teacher students: enrollment base OK");
+
+  console.log("Teacher students: test enrollment date");
+
+  await prisma.enrollment.findMany({
+    where: {
+      courseId: {
+        in: courseIds,
+      },
+      status: "ACTIVE",
+    },
+    select: {
+      id: true,
+      enrolledAt: true,
+    },
+  });
+
+  console.log("Teacher students: enrollment date OK");
+
+  console.log("Teacher students: test student relation");
+
+  await prisma.enrollment.findMany({
+    where: {
+      courseId: {
+        in: courseIds,
+      },
+      status: "ACTIVE",
+    },
+    select: {
+      id: true,
+      student: {
+        select: {
+          id: true,
+          studentId: true,
+          department: true,
+          year: true,
+        },
+      },
+    },
+  });
+
+  console.log("Teacher students: student relation OK");
+
+  console.log("Teacher students: test user relation");
+
+  await prisma.enrollment.findMany({
+    where: {
+      courseId: {
+        in: courseIds,
+      },
+      status: "ACTIVE",
+    },
+    select: {
+      id: true,
+      student: {
+        select: {
+          id: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              username: true,
+              status: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  console.log("Teacher students: user relation OK");
+
+  console.log("Teacher students: test course relation");
+
+  await prisma.enrollment.findMany({
+    where: {
+      courseId: {
+        in: courseIds,
+      },
+      status: "ACTIVE",
+    },
+    select: {
+      id: true,
+      course: {
+        select: {
+          id: true,
+          code: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  console.log("Teacher students: course relation OK");
   const enrollments = await prisma.enrollment.findMany({
     where: {
       courseId: {
@@ -219,7 +331,7 @@ console.log("Teacher students: loading enrollments");
       },
     },
   });
-console.log("Teacher students: enrollments OK");
+  console.log("Teacher students: enrollments OK");
   const studentMap = new Map<
     number,
     {
@@ -278,71 +390,71 @@ console.log("Teacher students: enrollments OK");
 
   const studentIds = students.map((s) => s.id);
 
-console.log("Teacher students: loading attendance");
+  console.log("Teacher students: loading attendance");
 
-const attendanceRecords = await prisma.attendance.findMany({
-  where: {
-    studentId: {
-      in: studentIds,
+  const attendanceRecords = await prisma.attendance.findMany({
+    where: {
+      studentId: {
+        in: studentIds,
+      },
+      courseId: {
+        in: courseIds,
+      },
     },
-    courseId: {
-      in: courseIds,
+    select: {
+      studentId: true,
+      status: true,
     },
-  },
-  select: {
-    studentId: true,
-    status: true,
-  },
-});
+  });
 
-console.log("Teacher students: attendance OK");
+  console.log("Teacher students: attendance OK");
 
-console.log("Teacher students: loading grades");
+  console.log("Teacher students: loading grades");
 
-const gradeRecords = await prisma.grade.findMany({
-  where: {
-    studentId: {
-      in: studentIds,
+  const gradeRecords = await prisma.grade.findMany({
+    where: {
+      studentId: {
+        in: studentIds,
+      },
+      courseId: {
+        in: courseIds,
+      },
     },
-    courseId: {
-      in: courseIds,
+    select: {
+      studentId: true,
+      total: true,
     },
-  },
-  select: {
-    studentId: true,
-    total: true,
-  },
-});
+  });
 
-console.log("Teacher students: grades OK");
+  console.log("Teacher students: grades OK");
 
-console.log("Teacher students: loading assignments");
+  console.log("Teacher students: loading assignments");
 
-const assignmentRecords = await prisma.assignment.findMany({
-  where: {
-    courseId: {
-      in: courseIds,
+  const assignmentRecords = await prisma.assignment.findMany({
+    where: {
+      courseId: {
+        in: courseIds,
+      },
+      status: "ACTIVE",
     },
-    status: "ACTIVE",
-  },
-  select: {
-    id: true,
-    courseId: true,
-    submissions: {
-      where: {
-        studentId: {
-          in: studentIds,
+    select: {
+      id: true,
+      courseId: true,
+      submissions: {
+        where: {
+          studentId: {
+            in: studentIds,
+          },
+        },
+        select: {
+          studentId: true,
+          status: true,
         },
       },
-      select: {
-        studentId: true,
-        status: true,
-      },
     },
-  },
-});
+  });
 
-console.log("Teacher students: assignments OK");
+  console.log("Teacher students: assignments OK");
 
   const attendanceMap = new Map<number, { total: number; present: number }>();
   const gradeMap = new Map<number, number[]>();
