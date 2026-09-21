@@ -308,7 +308,10 @@ export async function getMyTeacherStudents(userId: number) {
       },
       status: "ACTIVE",
     },
-    include: {
+    select: {
+      id: true,
+      studentId: true,
+      courseId: true,
       student: {
         select: {
           id: true,
