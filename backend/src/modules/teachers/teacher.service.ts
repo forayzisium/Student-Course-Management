@@ -310,7 +310,11 @@ export async function getMyTeacherStudents(userId: number) {
     },
     include: {
       student: {
-        include: {
+        select: {
+          id: true,
+          studentId: true,
+          department: true,
+          year: true,
           user: {
             select: {
               id: true,
