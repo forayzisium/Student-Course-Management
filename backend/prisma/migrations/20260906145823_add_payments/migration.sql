@@ -1,0 +1,17 @@
+-- CreateTable
+CREATE TABLE `payments` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `studentId` INTEGER NOT NULL,
+    `feeType` VARCHAR(191) NOT NULL,
+    `amount` DOUBLE NOT NULL,
+    `method` ENUM('CASH', 'CARD', 'BANK_TRANSFER', 'MOBILE_BANKING') NOT NULL,
+    `paymentDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `status` ENUM('PENDING', 'PAID', 'FAILED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `payments` ADD CONSTRAINT `payments_studentId_fkey` FOREIGN KEY (`studentId`) REFERENCES `student_profiles`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
