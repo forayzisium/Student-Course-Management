@@ -585,8 +585,6 @@ export default function StudentDashboard() {
       if (document.visibilityState === "visible") void loadDashboard();
     };
     window.addEventListener("scm:student-refresh", refresh);
-    window.addEventListener("focus", refresh);
-    document.addEventListener("visibilitychange", refresh);
 
     return () => {
       mounted = false;
@@ -594,8 +592,6 @@ export default function StudentDashboard() {
         new DOMException("Student dashboard unmounted", "AbortError"),
       );
       window.removeEventListener("scm:student-refresh", refresh);
-      window.removeEventListener("focus", refresh);
-      document.removeEventListener("visibilitychange", refresh);
     };
   }, []);
 

@@ -130,7 +130,6 @@ export default function PayFeesPage() {
     });
   };
 
-
   const loadFees = async () => {
     try {
       const token = localStorage.getItem("scm_token");
@@ -185,10 +184,10 @@ export default function PayFeesPage() {
       setNextDueDate(
         firstDueDate
           ? firstDueDate.toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })
           : null,
       );
     } catch (err) {
@@ -199,7 +198,6 @@ export default function PayFeesPage() {
       );
     }
   };
-
 
   const loadPayments = async (showLoading = true) => {
     try {
@@ -264,7 +262,6 @@ export default function PayFeesPage() {
     await loadFees();
     await loadPayments(false);
   });
-
 
   useEffect(() => {
     let cancelled = false;
@@ -347,13 +344,12 @@ export default function PayFeesPage() {
         setNextDueDate(
           firstDueDate
             ? firstDueDate.toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
             : null,
         );
-
 
         const formattedPayments: Payment[] = (paymentsResponse.data || []).map(
           (payment) => ({
@@ -398,7 +394,6 @@ export default function PayFeesPage() {
     };
   }, []);
 
-
   const toggleFee = (id: number) => {
     setSelectedFees((current) =>
       current.includes(id)
@@ -406,7 +401,6 @@ export default function PayFeesPage() {
         : [...current, id],
     );
   };
-
 
   const getBackendPaymentMethod = () => {
     if (paymentMethod === "bKash" || paymentMethod === "Nagad") {
@@ -419,7 +413,6 @@ export default function PayFeesPage() {
 
     return "MOBILE_BANKING";
   };
-
 
   const handlePayment = async () => {
     if (selectedFeeItems.length === 0) {
@@ -477,7 +470,7 @@ export default function PayFeesPage() {
 
       setSelectedFees([]);
 
-      await loadPayments();
+      await loadPayments(false);
       await loadFees();
 
       setTimeout(() => {
@@ -494,7 +487,6 @@ export default function PayFeesPage() {
     }
   };
 
-
   const lastPayment = payments.find((payment) => payment.status === "Paid");
   const totalCharges = accountFees.reduce(
     (sum, fee) => sum + Number(fee.amount),
@@ -508,7 +500,6 @@ export default function PayFeesPage() {
   return (
     <div className="flex min-h-screen bg-[#EAE6DC]">
       <main className="min-w-0 flex-1 p-5 sm:p-8">
-
         <div className="mb-8">
           <p className="font-serif text-sm text-[#B45A2A]">Student Portal</p>
 
@@ -522,7 +513,6 @@ export default function PayFeesPage() {
             reviewed.
           </p>
         </div>
-
 
         {error && (
           <div className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
@@ -538,7 +528,6 @@ export default function PayFeesPage() {
           </div>
         )}
 
-
         {paymentSuccess && (
           <div className="mb-6 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-sm font-medium text-green-700">
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-green-100">
@@ -549,9 +538,7 @@ export default function PayFeesPage() {
           </div>
         )}
 
-
         <div className="grid gap-5 lg:grid-cols-3">
-
           <div className="rounded-2xl bg-[#B45A2A] p-6 text-white shadow-sm">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-white/80">
@@ -576,7 +563,6 @@ export default function PayFeesPage() {
               </span>
             </p>
           </div>
-
 
           <div className="rounded-2xl bg-white p-6 shadow-sm">
             <div className="flex items-center gap-3">
@@ -609,7 +595,6 @@ export default function PayFeesPage() {
                 : "You have no outstanding fees."}
             </p>
           </div>
-
 
           <div className="rounded-2xl bg-white p-6 shadow-sm">
             <div className="flex items-center gap-3">
@@ -799,9 +784,7 @@ export default function PayFeesPage() {
           </div>
         </section>
 
-
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
-
           <section className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
             <div className="mb-6">
               <h2 className="text-lg font-bold text-slate-900">
@@ -833,16 +816,18 @@ export default function PayFeesPage() {
                       key={fee.id}
                       type="button"
                       onClick={() => toggleFee(fee.id)}
-                      className={`flex w-full items-center gap-4 rounded-xl border p-4 text-left transition ${selected
-                        ? "border-slate-300 bg-[#B45A2A]/5"
-                        : "border-slate-100 hover:bg-slate-50"
-                        }`}
+                      className={`flex w-full items-center gap-4 rounded-xl border p-4 text-left transition ${
+                        selected
+                          ? "border-slate-300 bg-[#B45A2A]/5"
+                          : "border-slate-100 hover:bg-slate-50"
+                      }`}
                     >
                       <div
-                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${selected
-                          ? "border-[#B45A2A] bg-[#B45A2A] text-white"
-                          : "border-slate-300"
-                          }`}
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${
+                          selected
+                            ? "border-[#B45A2A] bg-[#B45A2A] text-white"
+                            : "border-slate-300"
+                        }`}
                       >
                         {selected && (
                           <svg
@@ -884,7 +869,6 @@ export default function PayFeesPage() {
               )}
             </div>
 
-
             <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-6">
               <span className="font-semibold text-slate-700">
                 Total Selected
@@ -896,7 +880,6 @@ export default function PayFeesPage() {
             </div>
           </section>
 
-
           <section className="h-fit rounded-2xl bg-white p-6 shadow-sm sm:p-7">
             <h2 className="text-lg font-bold text-slate-900">Payment</h2>
 
@@ -904,16 +887,15 @@ export default function PayFeesPage() {
               Choose the method used for your external payment.
             </p>
 
-
             <div className="mt-6 space-y-3">
-
               <button
                 type="button"
                 onClick={() => setPaymentMethod("bKash")}
-                className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${paymentMethod === "bKash"
-                  ? "border-slate-300 bg-[#B45A2A]/5"
-                  : "border-slate-100 hover:bg-slate-50"
-                  }`}
+                className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${
+                  paymentMethod === "bKash"
+                    ? "border-slate-300 bg-[#B45A2A]/5"
+                    : "border-slate-100 hover:bg-slate-50"
+                }`}
               >
                 <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-[#E2136E]">
                   <img
@@ -930,21 +912,22 @@ export default function PayFeesPage() {
                 </div>
 
                 <div
-                  className={`h-4 w-4 rounded-full border ${paymentMethod === "bKash"
-                    ? "border-slate-100 bg-[#B45A2A]"
-                    : "border-slate-300"
-                    }`}
+                  className={`h-4 w-4 rounded-full border ${
+                    paymentMethod === "bKash"
+                      ? "border-slate-100 bg-[#B45A2A]"
+                      : "border-slate-300"
+                  }`}
                 />
               </button>
-
 
               <button
                 type="button"
                 onClick={() => setPaymentMethod("Nagad")}
-                className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${paymentMethod === "Nagad"
-                  ? "border-slate-300 bg-[#B45A2A]/5"
-                  : "border-slate-100 hover:bg-slate-50"
-                  }`}
+                className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${
+                  paymentMethod === "Nagad"
+                    ? "border-slate-300 bg-[#B45A2A]/5"
+                    : "border-slate-100 hover:bg-slate-50"
+                }`}
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white p-1">
                   <img
@@ -961,21 +944,22 @@ export default function PayFeesPage() {
                 </div>
 
                 <div
-                  className={`h-4 w-4 rounded-full border ${paymentMethod === "Nagad"
-                    ? "border-slate-100 bg-[#B45A2A]"
-                    : "border-slate-300"
-                    }`}
+                  className={`h-4 w-4 rounded-full border ${
+                    paymentMethod === "Nagad"
+                      ? "border-slate-100 bg-[#B45A2A]"
+                      : "border-slate-300"
+                  }`}
                 />
               </button>
-
 
               <button
                 type="button"
                 onClick={() => setPaymentMethod("Card")}
-                className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${paymentMethod === "Card"
-                  ? "border-slate-300 bg-[#B45A2A]/5"
-                  : "border-slate-100 hover:bg-slate-50"
-                  }`}
+                className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${
+                  paymentMethod === "Card"
+                    ? "border-slate-300 bg-[#B45A2A]/5"
+                    : "border-slate-100 hover:bg-slate-50"
+                }`}
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white p-1">
                   <img
@@ -992,14 +976,14 @@ export default function PayFeesPage() {
                 </div>
 
                 <div
-                  className={`h-4 w-4 rounded-full border ${paymentMethod === "Card"
-                    ? "border-slate-100 bg-[#B45A2A]"
-                    : "border-slate-300"
-                    }`}
+                  className={`h-4 w-4 rounded-full border ${
+                    paymentMethod === "Card"
+                      ? "border-slate-100 bg-[#B45A2A]"
+                      : "border-slate-300"
+                  }`}
                 />
               </button>
             </div>
-
 
             <div className="mt-6 rounded-xl bg-[#F0EDE4] p-4">
               <div className="flex justify-between text-sm">
@@ -1021,7 +1005,6 @@ export default function PayFeesPage() {
               </div>
             </div>
 
-
             <button
               type="button"
               disabled={selectedFees.length === 0 || submitting}
@@ -1036,7 +1019,6 @@ export default function PayFeesPage() {
             </p>
           </section>
         </div>
-
 
         <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm sm:p-8">
           <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -1076,7 +1058,6 @@ export default function PayFeesPage() {
             </div>
           ) : (
             <>
-
               <div className="hidden overflow-x-auto md:block">
                 <table className="w-full">
                   <thead>
@@ -1117,12 +1098,13 @@ export default function PayFeesPage() {
 
                         <td className="py-5 text-right">
                           <span
-                            className={`rounded-full px-3 py-1 text-xs font-semibold ${payment.status === "Paid"
-                              ? "bg-green-50 text-green-600"
-                              : payment.status === "Failed"
-                                ? "bg-red-50 text-red-600"
-                                : "bg-yellow-50 text-yellow-600"
-                              }`}
+                            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                              payment.status === "Paid"
+                                ? "bg-green-50 text-green-600"
+                                : payment.status === "Failed"
+                                  ? "bg-red-50 text-red-600"
+                                  : "bg-yellow-50 text-yellow-600"
+                            }`}
                           >
                             {payment.status}
                           </span>
@@ -1132,7 +1114,6 @@ export default function PayFeesPage() {
                   </tbody>
                 </table>
               </div>
-
 
               <div className="space-y-3 md:hidden">
                 {payments.map((payment) => (
@@ -1152,12 +1133,13 @@ export default function PayFeesPage() {
                       </div>
 
                       <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${payment.status === "Paid"
-                          ? "bg-green-50 text-green-600"
-                          : payment.status === "Failed"
-                            ? "bg-red-50 text-red-600"
-                            : "bg-yellow-50 text-yellow-600"
-                          }`}
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                          payment.status === "Paid"
+                            ? "bg-green-50 text-green-600"
+                            : payment.status === "Failed"
+                              ? "bg-red-50 text-red-600"
+                              : "bg-yellow-50 text-yellow-600"
+                        }`}
                       >
                         {payment.status}
                       </span>
@@ -1173,11 +1155,9 @@ export default function PayFeesPage() {
           )}
         </section>
 
-
         {showPaymentModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
             <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl sm:p-8">
-
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#F0EDE4] text-xl text-[#B45A2A]">
                 ৳
               </div>

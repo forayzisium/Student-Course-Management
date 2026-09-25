@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { apiFetch } from "@/lib/api";
+import { useRealtimeRefresh } from "@/lib/hooks/useRealtimeSync";
 import TeacherMetricCard from "@/components/teachers/TeacherMetricCard";
 
 type ApiAttendance = {
@@ -122,43 +123,47 @@ export default function StudentAttendancePage() {
   const [courseFilter, setCourseFilter] = useState("All");
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    const fetchAttendance = async () => {
-      try {
-        setLoading(true);
-        setError("");
+  const fetchAttendance = async (showLoading = true) => {
+    try {
+      if (showLoading) setLoading(true);
+      setError("");
 
-        const token = localStorage.getItem("scm_token");
+      const token = localStorage.getItem("scm_token");
 
-        if (!token) {
-          throw new Error("Authentication required");
-        }
-
-        const response = await apiFetch<{
-          success: boolean;
-          data: ApiAttendance[];
-        }>("/attendance/my-attendance", {
-          token,
-        });
-
-        setRecords(response.data || []);
-      } catch (error) {
-        console.error("Failed to fetch attendance:", error);
-
-        setError(
-          error instanceof Error ? error.message : "Failed to load attendance",
-        );
-      } finally {
-        setLoading(false);
+      if (!token) {
+        throw new Error("Authentication required");
       }
-    };
 
+      const response = await apiFetch<{
+        success: boolean;
+        data: ApiAttendance[];
+      }>("/attendance/my-attendance", {
+        token,
+      });
+
+      setRecords(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch attendance:", error);
+
+      setError(
+        error instanceof Error ? error.message : "Failed to load attendance",
+      );
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
+
+  useRealtimeRefresh(async () => {
+    await fetchAttendance(false);
+  });
+
+  const loadInitialAttendance = useEffectEvent(() => {
     void fetchAttendance();
-    const refresh = () => {
-      void fetchAttendance();
-    };
-    window.addEventListener("scm:student-refresh", refresh);
-    return () => window.removeEventListener("scm:student-refresh", refresh);
+  });
+
+  useEffect(() => {
+    const timer = setTimeout(loadInitialAttendance, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const courseStats = useMemo(() => computeCourseStats(records), [records]);

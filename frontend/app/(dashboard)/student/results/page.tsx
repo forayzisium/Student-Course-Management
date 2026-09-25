@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { weightedGpa } from "@/lib/academic-metrics";
 import { apiFetch } from "@/lib/api";
+import { useRealtimeRefresh } from "@/lib/hooks/useRealtimeSync";
 
 type ApiGrade = {
   id: number;
@@ -106,45 +107,47 @@ export default function StudentResults() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchGrades = async () => {
-      try {
-        setLoading(true);
-        setError("");
+  const fetchGrades = async (showLoading = true) => {
+    try {
+      if (showLoading) setLoading(true);
+      setError("");
 
-        const token = localStorage.getItem("scm_token");
+      const token = localStorage.getItem("scm_token");
 
-        if (!token) {
-          throw new Error("Authentication required");
-        }
-
-        const response = await apiFetch<{
-          success: boolean;
-          data: ApiGrade[];
-        }>("/grades/my", {
-          token,
-        });
-
-        setGrades(response.data ?? []);
-      } catch (error) {
-        console.error("Failed to fetch grades:", error);
-
-        setError(
-          error instanceof Error
-            ? error.message
-            : "Failed to load your results.",
-        );
-      } finally {
-        setLoading(false);
+      if (!token) {
+        throw new Error("Authentication required");
       }
-    };
 
+      const response = await apiFetch<{
+        success: boolean;
+        data: ApiGrade[];
+      }>("/grades/my", {
+        token,
+      });
+
+      setGrades(response.data ?? []);
+    } catch (error) {
+      console.error("Failed to fetch grades:", error);
+
+      setError(
+        error instanceof Error ? error.message : "Failed to load your results.",
+      );
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
+
+  useRealtimeRefresh(async () => {
+    await fetchGrades(false);
+  });
+
+  const loadInitialGrades = useEffectEvent(() => {
     void fetchGrades();
-    const refresh = () => {
-      void fetchGrades();
-    };
-    window.addEventListener("scm:student-refresh", refresh);
-    return () => window.removeEventListener("scm:student-refresh", refresh);
+  });
+
+  useEffect(() => {
+    const timer = setTimeout(loadInitialGrades, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const allResults = useMemo<CourseResult[]>(() => {

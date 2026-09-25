@@ -153,38 +153,38 @@ export default function StudentCourses() {
   };
 
   const fetchMyCourses = async (showLoading = true) => {
-  try {
-    if (showLoading) {
-      setLoadingMyCourses(true);
+    try {
+      if (showLoading) {
+        setLoadingMyCourses(true);
+      }
+
+      const token = getToken();
+
+      if (!token) {
+        throw new Error("Authentication token not found");
+      }
+
+      const response = await apiFetch<EnrollmentResponse<BackendCourse>>(
+        "/enrollments/my-courses",
+        {
+          token,
+        },
+      );
+
+      const courses = getEnrolledCourses(response);
+
+      setMyCourses(courses.map((course) => mapCourse(course, true)));
+      setEnrolledCourseIds(courses.map((course) => course.id));
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to load your courses",
+      );
+    } finally {
+      if (showLoading) {
+        setLoadingMyCourses(false);
+      }
     }
-
-    const token = getToken();
-
-    if (!token) {
-      throw new Error("Authentication token not found");
-    }
-
-    const response = await apiFetch<EnrollmentResponse<BackendCourse>>(
-      "/enrollments/my-courses",
-      {
-        token,
-      },
-    );
-
-    const courses = getEnrolledCourses(response);
-
-    setMyCourses(courses.map((course) => mapCourse(course, true)));
-    setEnrolledCourseIds(courses.map((course) => course.id));
-  } catch (err) {
-    setError(
-      err instanceof Error ? err.message : "Failed to load your courses",
-    );
-  } finally {
-    if (showLoading) {
-      setLoadingMyCourses(false);
-    }
-  }
-};
+  };
 
   const fetchAvailableCourses = async (showLoading = true) => {
     try {
@@ -224,9 +224,9 @@ export default function StudentCourses() {
       }
     }
   };
-  const fetchEnrollmentHistory = async () => {
+  const fetchEnrollmentHistory = async (showLoading = true) => {
     try {
-      setLoadingHistory(true);
+      if (showLoading) setLoadingHistory(true);
       setError("");
 
       const token = getToken();
@@ -250,21 +250,21 @@ export default function StudentCourses() {
           : "Failed to load enrollment history",
       );
     } finally {
-      setLoadingHistory(false);
+      if (showLoading) setLoadingHistory(false);
     }
   };
 
-useRealtimeRefresh(async () => {
-  await fetchMyCourses(false);
+  useRealtimeRefresh(async () => {
+    await fetchMyCourses(false);
 
-  if (activeTab === "browse") {
-    await fetchAvailableCourses(false);
-  }
+    if (activeTab === "browse") {
+      await fetchAvailableCourses(false);
+    }
 
-  if (activeTab === "history") {
-    await fetchEnrollmentHistory();
-  }
-});
+    if (activeTab === "history") {
+      await fetchEnrollmentHistory(false);
+    }
+  });
 
   const loadInitialCourses = useEffectEvent(() => {
     void fetchStudentProfile();
@@ -365,20 +365,22 @@ useRealtimeRefresh(async () => {
         <div className="mb-7 flex flex-wrap gap-2 rounded-xl bg-white p-2 shadow-sm">
           <button
             onClick={() => setActiveTab("my-courses")}
-            className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${activeTab === "my-courses"
-              ? "bg-[#B45A2A] text-white"
-              : "text-slate-600 hover:bg-slate-100"
-              }`}
+            className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+              activeTab === "my-courses"
+                ? "bg-[#B45A2A] text-white"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
           >
             My Courses
           </button>
 
           <button
             onClick={handleBrowseCourses}
-            className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${activeTab === "browse"
-              ? "bg-[#B45A2A] text-white"
-              : "text-slate-600 hover:bg-slate-100"
-              }`}
+            className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+              activeTab === "browse"
+                ? "bg-[#B45A2A] text-white"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
           >
             Browse Courses
           </button>
@@ -388,15 +390,15 @@ useRealtimeRefresh(async () => {
               setActiveTab("history");
               fetchEnrollmentHistory();
             }}
-            className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${activeTab === "history"
-              ? "bg-[#B45A2A] text-white"
-              : "text-slate-600 hover:bg-slate-100"
-              }`}
+            className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+              activeTab === "history"
+                ? "bg-[#B45A2A] text-white"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
           >
             Enrollment History
           </button>
         </div>
-
 
         {activeTab === "my-courses" && (
           <section>
@@ -440,7 +442,6 @@ useRealtimeRefresh(async () => {
             )}
           </section>
         )}
-
 
         {activeTab === "browse" && (
           <section>
@@ -567,13 +568,14 @@ useRealtimeRefresh(async () => {
                               loadingProfile ||
                               !studentProfileId
                             }
-                            className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition ${isEnrolled ||
+                            className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition ${
+                              isEnrolled ||
                               isEnrolling ||
                               loadingProfile ||
                               !studentProfileId
-                              ? "cursor-not-allowed opacity-50"
-                              : ""
-                              }`}
+                                ? "cursor-not-allowed opacity-50"
+                                : ""
+                            }`}
                           >
                             {loadingProfile
                               ? "Loading..."
@@ -604,7 +606,6 @@ useRealtimeRefresh(async () => {
             )}
           </section>
         )}
-
 
         {activeTab === "history" && (
           <section>
@@ -742,10 +743,11 @@ useRealtimeRefresh(async () => {
 
                           <td className="px-6 py-5">
                             <span
-                              className={`rounded-full px-3 py-1 text-xs font-medium ${item.status === "ACTIVE"
-                                ? "bg-green-50 text-green-700"
-                                : "bg-slate-100 text-slate-600"
-                                }`}
+                              className={`rounded-full px-3 py-1 text-xs font-medium ${
+                                item.status === "ACTIVE"
+                                  ? "bg-green-50 text-green-700"
+                                  : "bg-slate-100 text-slate-600"
+                              }`}
                             >
                               {item.status}
                             </span>

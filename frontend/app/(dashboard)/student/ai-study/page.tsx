@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { apiFetch } from "@/lib/api";
+import { useRealtimeRefresh } from "@/lib/hooks/useRealtimeSync";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -113,42 +114,46 @@ export default function AIStudyPage() {
     fetchUsage();
   }, []);
 
-  useEffect(() => {
-    const fetchOverview = async () => {
-      try {
-        setOverviewLoading(true);
-        setOverviewError("");
+  const fetchOverview = async (showLoading = true) => {
+    try {
+      if (showLoading) setOverviewLoading(true);
+      setOverviewError("");
 
-        const token = localStorage.getItem("scm_token");
+      const token = localStorage.getItem("scm_token");
 
-        if (!token) {
-          return;
-        }
-
-        const response = await apiFetch<AIOverviewResponse>("/ai/overview", {
-          token,
-        });
-
-        if (response.success && response.data) {
-          setSubjects(response.data.subjects || []);
-          setSuggestions(response.data.suggestions || []);
-        }
-      } catch (error) {
-        console.error("Failed to load AI overview:", error);
-        setOverviewError(
-          error instanceof Error ? error.message : "Failed to load overview",
-        );
-      } finally {
-        setOverviewLoading(false);
+      if (!token) {
+        return;
       }
-    };
 
+      const response = await apiFetch<AIOverviewResponse>("/ai/overview", {
+        token,
+      });
+
+      if (response.success && response.data) {
+        setSubjects(response.data.subjects || []);
+        setSuggestions(response.data.suggestions || []);
+      }
+    } catch (error) {
+      console.error("Failed to load AI overview:", error);
+      setOverviewError(
+        error instanceof Error ? error.message : "Failed to load overview",
+      );
+    } finally {
+      if (showLoading) setOverviewLoading(false);
+    }
+  };
+
+  useRealtimeRefresh(async () => {
+    await fetchOverview(false);
+  });
+
+  const loadInitialOverview = useEffectEvent(() => {
     void fetchOverview();
-    const refresh = () => {
-      void fetchOverview();
-    };
-    window.addEventListener("scm:student-refresh", refresh);
-    return () => window.removeEventListener("scm:student-refresh", refresh);
+  });
+
+  useEffect(() => {
+    const timer = setTimeout(loadInitialOverview, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const filteredSubjects =
