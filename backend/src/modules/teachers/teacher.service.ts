@@ -163,8 +163,6 @@ export async function getMyTeacherProfile(userId: number) {
   });
 }
 export async function getMyTeacherStudents(userId: number) {
-  console.log("Teacher students: loading teacher");
-
   const teacher = await prisma.user.findFirst({
     where: {
       id: userId,
@@ -178,7 +176,6 @@ export async function getMyTeacherStudents(userId: number) {
       },
     },
   });
-  console.log("Teacher students: teacher OK");
   if (!teacher) {
     throw new Error("Teacher not found");
   }
@@ -188,119 +185,6 @@ export async function getMyTeacherStudents(userId: number) {
   if (courseIds.length === 0) {
     return [];
   }
-  console.log("Teacher students: loading enrollments");
-  console.log("Teacher students: test enrollment base");
-
-  await prisma.enrollment.findMany({
-    where: {
-      courseId: {
-        in: courseIds,
-      },
-      status: "ACTIVE",
-    },
-    select: {
-      id: true,
-      studentId: true,
-      courseId: true,
-      status: true,
-    },
-  });
-
-  console.log("Teacher students: enrollment base OK");
-
-  console.log("Teacher students: test enrollment date");
-
-  await prisma.enrollment.findMany({
-    where: {
-      courseId: {
-        in: courseIds,
-      },
-      status: "ACTIVE",
-    },
-    select: {
-      id: true,
-      enrolledAt: true,
-    },
-  });
-
-  console.log("Teacher students: enrollment date OK");
-
-  console.log("Teacher students: test student relation");
-
-  await prisma.enrollment.findMany({
-    where: {
-      courseId: {
-        in: courseIds,
-      },
-      status: "ACTIVE",
-    },
-    select: {
-      id: true,
-      student: {
-        select: {
-          id: true,
-          studentId: true,
-          department: true,
-          year: true,
-        },
-      },
-    },
-  });
-
-  console.log("Teacher students: student relation OK");
-
-  console.log("Teacher students: test user relation");
-
-  await prisma.enrollment.findMany({
-    where: {
-      courseId: {
-        in: courseIds,
-      },
-      status: "ACTIVE",
-    },
-    select: {
-      id: true,
-      student: {
-        select: {
-          id: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              username: true,
-              status: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  console.log("Teacher students: user relation OK");
-
-  console.log("Teacher students: test course relation");
-
-  await prisma.enrollment.findMany({
-    where: {
-      courseId: {
-        in: courseIds,
-      },
-      status: "ACTIVE",
-    },
-    select: {
-      id: true,
-      course: {
-        select: {
-          id: true,
-          code: true,
-          name: true,
-        },
-      },
-    },
-  });
-
-  console.log("Teacher students: course relation OK");
   const enrollments = await prisma.enrollment.findMany({
     where: {
       courseId: {
@@ -312,7 +196,7 @@ export async function getMyTeacherStudents(userId: number) {
       id: true,
       studentId: true,
       courseId: true,
-      student: {
+      student: {     
         select: {
           id: true,
           studentId: true,
@@ -338,7 +222,6 @@ export async function getMyTeacherStudents(userId: number) {
       },
     },
   });
-  console.log("Teacher students: enrollments OK");
   const studentMap = new Map<
     number,
     {
@@ -397,8 +280,6 @@ export async function getMyTeacherStudents(userId: number) {
 
   const studentIds = students.map((s) => s.id);
 
-  console.log("Teacher students: loading attendance");
-
   const attendanceRecords = await prisma.attendance.findMany({
     where: {
       studentId: {
@@ -414,10 +295,6 @@ export async function getMyTeacherStudents(userId: number) {
     },
   });
 
-  console.log("Teacher students: attendance OK");
-
-  console.log("Teacher students: loading grades");
-
   const gradeRecords = await prisma.grade.findMany({
     where: {
       studentId: {
@@ -432,10 +309,6 @@ export async function getMyTeacherStudents(userId: number) {
       total: true,
     },
   });
-
-  console.log("Teacher students: grades OK");
-
-  console.log("Teacher students: loading assignments");
 
   const assignmentRecords = await prisma.assignment.findMany({
     where: {
@@ -460,8 +333,6 @@ export async function getMyTeacherStudents(userId: number) {
       },
     },
   });
-
-  console.log("Teacher students: assignments OK");
 
   const attendanceMap = new Map<number, { total: number; present: number }>();
   const gradeMap = new Map<number, number[]>();
