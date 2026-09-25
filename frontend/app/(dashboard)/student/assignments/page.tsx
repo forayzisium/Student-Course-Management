@@ -122,7 +122,6 @@ function StudentAssignmentsContent() {
   const [submitError, setSubmitError] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-
   const formatDate = useCallback((dateString: string) => {
     const date = new Date(dateString);
 
@@ -136,7 +135,6 @@ function StudentAssignmentsContent() {
       year: "numeric",
     });
   }, []);
-
 
   const getAssignmentStatus = useCallback(
     (assignment: ApiAssignment): AssignmentStatus => {
@@ -154,7 +152,6 @@ function StudentAssignmentsContent() {
     },
     [],
   );
-
 
   const mapAssignment = useCallback(
     (assignment: ApiAssignment): Assignment => {
@@ -181,52 +178,53 @@ function StudentAssignmentsContent() {
     [formatDate, getAssignmentStatus],
   );
 
+  const loadAssignments = useCallback(
+    async (showLoading = true) => {
+      try {
+        if (showLoading) {
+          setLoading(true);
+        }
 
-  const loadAssignments = useCallback(async (showLoading = true) => {
-    try {
-      if (showLoading) {
-        setLoading(true);
+        setError("");
+
+        const token = localStorage.getItem("scm_token");
+
+        if (!token) {
+          throw new Error("Authentication token not found.");
+        }
+
+        const response = await apiFetch<AssignmentsResponse>(
+          "/assignments/student-assignments",
+          {
+            token,
+          },
+        );
+
+        if (!response.success) {
+          throw new Error(response.message || "Failed to load assignments.");
+        }
+
+        const formattedAssignments = (response.data || []).map(mapAssignment);
+
+        setAssignments(formattedAssignments);
+      } catch (err) {
+        console.error("Failed to load student assignments:", err);
+
+        setError(
+          err instanceof Error ? err.message : "Failed to load assignments.",
+        );
+      } finally {
+        if (showLoading) {
+          setLoading(false);
+        }
       }
-
-      setError("");
-
-      const token = localStorage.getItem("scm_token");
-
-      if (!token) {
-        throw new Error("Authentication token not found.");
-      }
-
-      const response = await apiFetch<AssignmentsResponse>(
-        "/assignments/student-assignments",
-        {
-          token,
-        },
-      );
-
-      if (!response.success) {
-        throw new Error(response.message || "Failed to load assignments.");
-      }
-
-      const formattedAssignments = (response.data || []).map(mapAssignment);
-
-      setAssignments(formattedAssignments);
-    } catch (err) {
-      console.error("Failed to load student assignments:", err);
-
-      setError(
-        err instanceof Error ? err.message : "Failed to load assignments.",
-      );
-    } finally {
-      if (showLoading) {
-        setLoading(false);
-      }
-    }
-  }, [mapAssignment]);
+    },
+    [mapAssignment],
+  );
 
   useRealtimeRefresh(async () => {
     await loadAssignments(false);
   });
-
 
   useEffect(() => {
     let cancelled = false;
@@ -278,7 +276,6 @@ function StudentAssignmentsContent() {
     };
   }, [mapAssignment]);
 
-
   const filteredAssignments = useMemo(() => {
     const courseAssignments = selectedCourse
       ? assignments.filter((a) => String(a.courseId) === selectedCourse)
@@ -292,7 +289,6 @@ function StudentAssignmentsContent() {
     );
   }, [assignments, activeFilter, selectedCourse]);
 
-
   const pendingCount = assignments.filter(
     (assignment) => assignment.status === "Pending",
   ).length;
@@ -305,7 +301,6 @@ function StudentAssignmentsContent() {
     (assignment) => assignment.status === "Graded",
   ).length;
 
-
   const closeModal = () => {
     if (submitting || detailsLoading) {
       return;
@@ -315,7 +310,6 @@ function StudentAssignmentsContent() {
     setSelectedFile(null);
     setSubmitError("");
   };
-
 
   const handleOpenAssignment = async (assignment: Assignment) => {
     try {
@@ -438,7 +432,6 @@ function StudentAssignmentsContent() {
     setSelectedFile(file);
   };
 
-
   const handleSubmit = async () => {
     if (!selectedAssignment || submitting) {
       return;
@@ -523,11 +516,9 @@ function StudentAssignmentsContent() {
     }
   };
 
-
   const isPastDue = selectedAssignment
     ? new Date(selectedAssignment.rawDueDate) < new Date()
     : false;
-
 
   return (
     <div className="flex min-h-screen bg-[#EAE6DC]">
@@ -556,7 +547,6 @@ function StudentAssignmentsContent() {
           </p>
         </div>
 
-
         {error && (
           <div className="mb-6 flex items-center justify-between rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
             <span>{error}</span>
@@ -571,9 +561,7 @@ function StudentAssignmentsContent() {
           </div>
         )}
 
-
         <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-
           <div className="relative rounded-xl bg-white p-5 shadow-sm">
             <div className="absolute right-5 top-5 rounded-lg bg-slate-900 p-2 text-white">
               <svg
@@ -600,7 +588,6 @@ function StudentAssignmentsContent() {
             <p className="mt-1 text-xs text-slate-400">Need your attention</p>
           </div>
 
-
           <div className="relative rounded-xl bg-white p-5 shadow-sm">
             <div className="absolute right-5 top-5 rounded-lg bg-slate-900 p-2 text-white">
               <svg
@@ -626,7 +613,6 @@ function StudentAssignmentsContent() {
 
             <p className="mt-1 text-xs text-slate-400">Waiting for grading</p>
           </div>
-
 
           <div className="relative rounded-xl bg-white p-5 shadow-sm sm:col-span-2 lg:col-span-1">
             <div className="absolute right-5 top-5 rounded-lg bg-slate-900 p-2 text-white">
@@ -657,7 +643,6 @@ function StudentAssignmentsContent() {
           </div>
         </div>
 
-
         <div className="mb-6 flex flex-wrap gap-2">
           {(["All", "Pending", "Submitted", "Graded"] as const).map(
             (filter) => (
@@ -665,17 +650,17 @@ function StudentAssignmentsContent() {
                 key={filter}
                 type="button"
                 onClick={() => setActiveFilter(filter)}
-                className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${activeFilter === filter
-                  ? "bg-[#B45A2A] text-white"
-                  : "bg-white text-slate-600 shadow-sm hover:bg-slate-50"
-                  }`}
+                className={`rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+                  activeFilter === filter
+                    ? "bg-[#B45A2A] text-white"
+                    : "bg-white text-slate-600 shadow-sm hover:bg-slate-50"
+                }`}
               >
                 {filter}
               </button>
             ),
           )}
         </div>
-
 
         {loading ? (
           <div className="rounded-xl bg-white p-10 text-center shadow-sm">
@@ -709,12 +694,13 @@ function StudentAssignmentsContent() {
                     </div>
 
                     <span
-                      className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${assignment.status === "Pending"
-                        ? "bg-amber-50 text-amber-700"
-                        : assignment.status === "Submitted"
-                          ? "bg-blue-50 text-blue-700"
-                          : "bg-green-50 text-green-700"
-                        }`}
+                      className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
+                        assignment.status === "Pending"
+                          ? "bg-amber-50 text-amber-700"
+                          : assignment.status === "Submitted"
+                            ? "bg-blue-50 text-blue-700"
+                            : "bg-green-50 text-green-700"
+                      }`}
                     >
                       {assignment.status}
                     </span>
@@ -774,11 +760,9 @@ function StudentAssignmentsContent() {
           </>
         )}
 
-
         {selectedAssignment && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
             <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
-
               <div className="flex items-start justify-between border-b border-slate-100 p-6">
                 <div>
                   <p className="text-sm font-medium text-[#B45A2A]">
@@ -831,7 +815,6 @@ function StudentAssignmentsContent() {
                   </div>
                 ) : (
                   <>
-
                     <div className="rounded-xl bg-[#F0EDE4] p-5">
                       <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                         Assignment
@@ -849,7 +832,6 @@ function StudentAssignmentsContent() {
                         </p>
                       </div>
                     </div>
-
 
                     {selectedAssignment.status === "Graded" && (
                       <div className="mt-5">
@@ -874,25 +856,27 @@ function StudentAssignmentsContent() {
                       </div>
                     )}
 
-
                     {selectedAssignment.status === "Pending" && (
                       <div className="mt-5">
                         <div
-                          className={`rounded-xl border p-5 ${isPastDue
-                            ? "border-red-100 bg-red-50"
-                            : "border-amber-100 bg-amber-50"
-                            }`}
+                          className={`rounded-xl border p-5 ${
+                            isPastDue
+                              ? "border-red-100 bg-red-50"
+                              : "border-amber-100 bg-amber-50"
+                          }`}
                         >
                           <p
-                            className={`font-semibold ${isPastDue ? "text-red-800" : "text-amber-800"
-                              }`}
+                            className={`font-semibold ${
+                              isPastDue ? "text-red-800" : "text-amber-800"
+                            }`}
                           >
                             {isPastDue ? "Deadline Passed" : "Ready to Submit"}
                           </p>
 
                           <p
-                            className={`mt-2 text-sm leading-6 ${isPastDue ? "text-red-700" : "text-amber-700"
-                              }`}
+                            className={`mt-2 text-sm leading-6 ${
+                              isPastDue ? "text-red-700" : "text-amber-700"
+                            }`}
                           >
                             {isPastDue
                               ? "The assignment deadline has passed, so the backend will not accept a new submission."
@@ -956,10 +940,11 @@ function StudentAssignmentsContent() {
                           type="button"
                           disabled={submitting || isPastDue || !selectedFile}
                           onClick={() => void handleSubmit()}
-                          className={`mt-4 w-full rounded-lg px-4 py-3 text-sm font-semibold text-white transition ${submitting || isPastDue || !selectedFile
-                            ? "cursor-not-allowed bg-slate-300"
-                            : "bg-[#111827] hover:bg-slate-800"
-                            }`}
+                          className={`mt-4 w-full rounded-lg px-4 py-3 text-sm font-semibold text-white transition ${
+                            submitting || isPastDue || !selectedFile
+                              ? "cursor-not-allowed bg-slate-300"
+                              : "bg-[#111827] hover:bg-slate-800"
+                          }`}
                         >
                           {submitting
                             ? "Uploading & Submitting..."
@@ -1003,7 +988,6 @@ function StudentAssignmentsContent() {
                   </>
                 )}
               </div>
-
 
               <div className="flex justify-end border-t border-slate-100 px-6 py-5">
                 <button

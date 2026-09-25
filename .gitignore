@@ -36,6 +36,19 @@ backend/.windsurf/
 **/skills-lock.json
 .DS_Store
 Thumbs.db
-*.pem
+*.key
+*.p12
+*.pfx
 *.tmp
 *.swp
+
+# Local database inspection/import artifacts
+/backend/aiven-before-data-import.sql
+/backend/aiven-columns.txt
+/backend/remaining-data.sql
+/backend/scm-data.sql
+/backend/backup-aiven.js
+/backend/import-aiven.js
+/backend/test-db.js
+/backend/test-prisma-dashboard.js
+/backend/test-teacher-students.js
