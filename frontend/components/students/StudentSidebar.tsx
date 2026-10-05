@@ -82,6 +82,26 @@ const navItems = [
     ),
   },
   {
+    name: "Course Updates",
+    href: "/student/announcements",
+    icon: (
+      <svg
+        className="h-5 w-5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5 11V7a2 2 0 0 1 2-2h8l4-2v14l-4-2H7a2 2 0 0 1-2-2v-2Z"
+        />
+        <path strokeLinecap="round" d="M8 15v4h4v-4" />
+      </svg>
+    ),
+  },
+  {
     name: "Results",
     href: "/student/results",
     icon: (
@@ -229,16 +249,13 @@ export default function StudentSidebar() {
         collapsed ? "w-16" : "w-56"
       }`}
     >
-
       <div
         className={`relative flex h-20 shrink-0 items-center border-b border-slate-200 shadow-sm shadow-[#45413D]/10 ${
           collapsed ? "justify-center px-3" : "gap-3 px-6"
         }`}
       >
-
         {collapsed ? (
           <div className="group relative h-8 w-8">
-
             <div
               className="
                                 absolute inset-0
@@ -273,7 +290,6 @@ export default function StudentSidebar() {
               </svg>
             </div>
 
-
             <button
               type="button"
               onClick={() => updateCollapsed(false)}
@@ -306,7 +322,6 @@ export default function StudentSidebar() {
           </div>
         ) : (
           <>
-
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#B45A2A] text-white shadow-lg shadow-[#45413D]/10">
               <svg
                 className="h-6 w-6"
@@ -329,14 +344,12 @@ export default function StudentSidebar() {
               </svg>
             </div>
 
-
             <div className="min-w-0">
               <p className="whitespace-nowrap font-serif text-lg font-normal tracking-tight text-[#333333]">
                 SC
                 <span className="text-[#B45A2A]">M</span>
               </p>
             </div>
-
 
             <button
               type="button"
@@ -372,9 +385,7 @@ export default function StudentSidebar() {
         )}
       </div>
 
-
       <nav className="flex-1 overflow-y-auto px-3 py-6">
-
         <div
           className={`mb-3 overflow-hidden transition-all duration-200 ${
             collapsed ? "h-0 opacity-0" : "h-4 opacity-100"
@@ -403,7 +414,6 @@ export default function StudentSidebar() {
                     : "text-slate-600 hover:bg-[#6F4E37]/30 hover:text-slate-900"
                 }`}
               >
-
                 <span
                   className={`shrink-0 transition-transform duration-200 group-hover:scale-110 ${
                     isActive
@@ -414,7 +424,6 @@ export default function StudentSidebar() {
                   {item.icon}
                 </span>
 
-
                 <span
                   className={`overflow-hidden whitespace-nowrap transition-all duration-200 ${
                     collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
@@ -422,7 +431,6 @@ export default function StudentSidebar() {
                 >
                   {item.name}
                 </span>
-
 
                 {!collapsed && isActive && (
                   <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-white" />
@@ -433,13 +441,11 @@ export default function StudentSidebar() {
         </div>
       </nav>
 
-
       <div
         className={`relative border-t border-slate-300 shadow-[0_2px_6px_rgba(0,0,0,0.04)] ${
           collapsed ? "p-2" : "p-4"
         }`}
       >
-
         {collapsed && collapsedProfileMenuOpen && (
           <div
             className="
@@ -456,14 +462,11 @@ export default function StudentSidebar() {
                                 shadow-2xl
                             "
           >
-
             <div className="px-4 pt-4">
               <div className="flex items-center gap-3 rounded-xl p-1">
-
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#B45A2A] text-xs font-medium text-white">
                   {userInitials}
                 </div>
-
 
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-white">
@@ -477,9 +480,7 @@ export default function StudentSidebar() {
 
             <div className="mx-4 my-4 border-t border-white/15" />
 
-
             <div className="px-2 pb-2">
-
               <Link
                 href="/student/profile"
                 onClick={() => setCollapsedProfileMenuOpen(false)}
@@ -507,7 +508,6 @@ export default function StudentSidebar() {
 
                 <span>Profile</span>
               </Link>
-
 
               <Link
                 href="/student/settings"
@@ -537,7 +537,6 @@ export default function StudentSidebar() {
             </div>
 
             <div className="mx-4 border-t border-white/15" />
-
 
             <div className="px-2 py-2">
               <button
@@ -582,7 +581,6 @@ export default function StudentSidebar() {
           </div>
         )}
 
-
         <button
           type="button"
           onClick={() => {
@@ -599,11 +597,9 @@ export default function StudentSidebar() {
             collapsed ? "justify-center p-2" : "gap-3 p-3"
           }`}
         >
-
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#B45A2A] text-sm font-serif text-white">
             {userInitials}
           </div>
-
 
           {!collapsed && (
             <div className="min-w-0 flex-1">
@@ -617,7 +613,6 @@ export default function StudentSidebar() {
             </div>
           )}
         </button>
-
 
         {!collapsed && expandedProfileMenuOpen && (
           <div className="absolute bottom-full left-4 z-[100] mb-2 w-[253px] overflow-hidden rounded-[20px] bg-[#363636] text-white shadow-2xl">
@@ -640,7 +635,6 @@ export default function StudentSidebar() {
             <div className="mx-4 my-4 border-t border-white/15" />
 
             <div className="px-2">
-
               <Link
                 href="/student/profile"
                 onClick={() => setExpandedProfileMenuOpen(false)}
@@ -663,7 +657,6 @@ export default function StudentSidebar() {
 
                 <span>Profile</span>
               </Link>
-
 
               <Link
                 href="/student/settings"
@@ -688,7 +681,6 @@ export default function StudentSidebar() {
             </div>
 
             <div className="mx-4 my-4 border-t border-white/15" />
-
 
             <div className="px-2 pb-2">
               <button

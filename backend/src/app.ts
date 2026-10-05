@@ -22,6 +22,7 @@ import feeRoutes from "./modules/fees/fee.routes";
 import activityRoutes from "./modules/activities/activity.routes";
 import eventRoutes from "./modules/events/event.routes";
 import semesterRoutes from "./modules/semesters/semester.routes";
+import announcementRoutes from "./modules/announcements/announcement.routes";
 
 import {
   realtimeEventBus,
@@ -110,6 +111,7 @@ app.use("/api/students", studentRoutes);
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/activities", activityRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/announcements", announcementRoutes);
 // Retired duplicate recommendations API. The student UI uses /api/ai/overview.
 app.use("/api/ai-study", (_req, res) =>
   res.status(410).json({

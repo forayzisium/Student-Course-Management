@@ -153,12 +153,20 @@ export default function TeacherDashboardPage() {
             </p>
           </div>
 
-          <div className="w-40 rounded-xl bg-slate-900 px-4 py-3 shadow-sm">
-            <p className="text-xs text-slate-300">Current Semester</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/teacher/announcements"
+              className="rounded-xl bg-[#B45A2A] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#9d4e25]"
+            >
+              Create Announcement
+            </Link>
+            <div className="w-40 rounded-xl bg-slate-900 px-4 py-3 shadow-sm">
+              <p className="text-xs text-slate-300">Current Semester</p>
 
-            <p className="mt-1 truncate text-sm font-semibold text-white">
-              {semesters.length ? semesters[0] : "No active term"}
-            </p>
+              <p className="mt-1 truncate text-sm font-semibold text-white">
+                {semesters.length ? semesters[0] : "No active term"}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -498,10 +506,11 @@ export default function TeacherDashboardPage() {
 
                             <td className="py-5 text-right">
                               <span
-                                className={`rounded-full px-3 py-1 text-xs font-semibold ${status === "Active"
+                                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                                  status === "Active"
                                     ? "bg-green-50 text-green-600"
                                     : "bg-slate-100 text-slate-500"
-                                  }`}
+                                }`}
                               >
                                 {status}
                               </span>
