@@ -42,19 +42,26 @@ export default function TeacherAnnouncementsPage() {
       const token = localStorage.getItem("scm_token");
       if (!token) throw new Error("Authentication required");
       const [courseResponse, announcementResponse] = await Promise.all([
-        apiFetch<{ success: boolean; data: Course[] }>("/courses/my-courses", {
-          token,
-        }),
-        apiFetch<{ success: boolean; data: CourseAnnouncement[] }>(
+        apiFetch<{ success: boolean; courses?: Course[] }>(
+          "/courses/my-courses",
+          { token },
+        ),
+        apiFetch<{ success: boolean; data?: CourseAnnouncement[] }>(
           "/announcements/teacher",
           { token },
         ),
       ]);
-      const ownCourses = courseResponse.data.filter(
+      const teacherCourses = Array.isArray(courseResponse.courses)
+        ? courseResponse.courses
+        : [];
+      const announcements = Array.isArray(announcementResponse.data)
+        ? announcementResponse.data
+        : [];
+      const ownCourses = teacherCourses.filter(
         (course) => course.status === "ACTIVE",
       );
       setCourses(ownCourses);
-      setItems(announcementResponse.data);
+      setItems(announcements);
       setForm((current) => ({
         ...current,
         courseId: current.courseId || String(ownCourses[0]?.id ?? ""),
