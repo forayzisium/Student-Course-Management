@@ -15,6 +15,7 @@ model User {
   email          String          @unique
   password       String
   role           UserRole        @default(STUDENT)
+  profileImage   String?         @db.VarChar(2048)
   isSuperAdmin   Boolean         @default(false)
   sessionVersion Int             @default(0)
   status         UserStatus      @default(ACTIVE)

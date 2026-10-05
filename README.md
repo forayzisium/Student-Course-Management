@@ -72,6 +72,9 @@ Never commit real `.env` files. Use the checked-in examples only as templates.
 | Name | Required | Purpose |
 | --- | --- | --- |
 | `NODE_ENV` | Yes | Use `production` in deployment. |
+| `CLOUDINARY_CLOUD_NAME` | Yes | Cloudinary cloud name for persistent student and teacher profile images. |
+| `CLOUDINARY_API_KEY` | Yes | Server-side Cloudinary API key. Do not expose it to the frontend. |
+| `CLOUDINARY_API_SECRET` | Yes | Server-side Cloudinary API secret. Keep it in Render environment variables only. |
 | `PORT` | Platform-provided | HTTP port; defaults to `5000` locally. |
 | `DATABASE_URL` | Yes | MySQL URL used by Prisma validation and migrations. |
 | `DB_HOST` | Yes | Runtime database host. |
@@ -152,6 +155,12 @@ Redeploy the frontend after changing `BACKEND_URL`.
 - Health-check path: `/`
 
 Configure every required backend variable in Render. Keep the database credentials and API keys secret. `PORT` is supplied by Render.
+
+Create a Cloudinary account before enabling profile-photo uploads and add
+`CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` to
+the Render backend service. Images are uploaded by the authenticated backend
+and stored under `scms/profile-images`; the browser never receives Cloudinary
+credentials. Redeploy the backend after configuring these variables.
 
 ### Hosted MySQL
 

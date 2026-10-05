@@ -49,10 +49,44 @@ export async function loginUser(
       username: user.username,
       email: user.email,
       role: user.role,
+      profileImage: user.profileImage,
       status: user.status,
       isSuperAdmin: user.isSuperAdmin,
     },
   };
+}
+
+export async function updateCurrentUserProfileImage(
+  userId: number,
+  profileImage: string,
+) {
+  const current = await prisma.user.findFirst({
+    where: {
+      id: userId,
+      role: { in: ["STUDENT", "TEACHER"] },
+      status: "ACTIVE",
+    },
+    select: { profileImage: true },
+  });
+
+  if (!current) throw new Error("Current user not found");
+
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: { profileImage },
+    select: {
+      id: true,
+      name: true,
+      username: true,
+      email: true,
+      role: true,
+      profileImage: true,
+      status: true,
+      isSuperAdmin: true,
+    },
+  });
+
+  return { user, previousProfileImage: current.profileImage };
 }
 export async function registerStudent(data: {
   name: string;

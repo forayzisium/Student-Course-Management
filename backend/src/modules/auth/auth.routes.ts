@@ -6,9 +6,11 @@ import {
   register,
   registerTeacherController,
   changeUserPassword,
+  updateMyProfileImage,
 } from "./auth.controller";
 
 import { requireAuth, requireRole } from "../../middleware/auth.middleware";
+import { profileImageUpload } from "../../middleware/profile-image-upload.middleware";
 
 const router = Router();
 
@@ -19,6 +21,14 @@ router.post("/register", register);
 router.post("/register/teacher", registerTeacherController);
 
 router.get("/me", requireAuth, getMe);
+
+router.put(
+  "/me/profile-image",
+  requireAuth,
+  requireRole("STUDENT", "TEACHER"),
+  profileImageUpload,
+  updateMyProfileImage,
+);
 
 if (process.env.NODE_ENV === "development") {
   router.get("/admin-test", requireAuth, requireRole("ADMIN"), adminTest);

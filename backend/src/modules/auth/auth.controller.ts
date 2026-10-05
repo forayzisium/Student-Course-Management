@@ -5,8 +5,14 @@ import {
   registerStudent,
   registerTeacher,
   changePassword,
+  updateCurrentUserProfileImage,
   type LoginRole,
 } from "./auth.service";
+import {
+  deleteProfileImage,
+  profileImagePublicId,
+  uploadProfileImage,
+} from "../../services/profile-image-storage.service";
 
 function isLoginRole(value: unknown): value is LoginRole {
   return value === "STUDENT" || value === "TEACHER" || value === "ADMIN";
@@ -64,6 +70,7 @@ export async function getMe(req: Request, res: Response) {
         username: true,
         email: true,
         role: true,
+        profileImage: true,
         status: true,
         isSuperAdmin: true,
       },
@@ -87,6 +94,59 @@ export async function getMe(req: Request, res: Response) {
       success: false,
       message: "Failed to get user information",
     });
+  }
+}
+
+export async function updateMyProfileImage(req: Request, res: Response) {
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: "Choose a JPEG, PNG, or WebP image to upload",
+    });
+  }
+
+  let uploadedPublicId: string | null = null;
+
+  try {
+    const uploaded = await uploadProfileImage(req.user!.userId, req.file);
+    uploadedPublicId = uploaded.publicId;
+
+    const { user, previousProfileImage } = await updateCurrentUserProfileImage(
+      req.user!.userId,
+      uploaded.secureUrl,
+    );
+
+    const previousPublicId = profileImagePublicId(previousProfileImage);
+    if (previousPublicId && previousPublicId !== uploaded.publicId) {
+      void deleteProfileImage(previousPublicId).catch((error) => {
+        console.error("Failed to remove previous profile image:", error);
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Profile photo updated successfully",
+      user,
+    });
+  } catch (error) {
+    if (uploadedPublicId) {
+      await deleteProfileImage(uploadedPublicId).catch((cleanupError) => {
+        console.error("Failed to remove rejected profile image:", cleanupError);
+      });
+    }
+
+    const message =
+      error instanceof Error ? error.message : "Failed to upload profile photo";
+    const status =
+      message === "Current user not found"
+        ? 404
+        : message === "Profile image storage is not configured"
+          ? 503
+          : message.startsWith("The uploaded file")
+            ? 400
+            : 502;
+
+    return res.status(status).json({ success: false, message });
   }
 }
 export async function adminTest(req: Request, res: Response) {

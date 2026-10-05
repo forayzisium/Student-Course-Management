@@ -143,6 +143,7 @@ export async function getMyStudentProfile(userId: number) {
       name: true,
       username: true,
       email: true,
+      profileImage: true,
       status: true,
       createdAt: true,
 
@@ -256,6 +257,7 @@ export async function updateMyStudentProfile(
         name: true,
         username: true,
         email: true,
+        profileImage: true,
         status: true,
       },
     });

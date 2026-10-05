@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/lib/auth-context";
+import ProfileAvatar from "@/components/ui/ProfileAvatar";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -229,14 +230,6 @@ export default function StudentSidebar() {
 
   const userName = user?.name || "Student";
 
-  const userInitials =
-    userName
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
-      .join("") || "ST";
-
   const userRole = user?.role
     ? user.role.charAt(0) + user.role.slice(1).toLowerCase()
     : "Student";
@@ -464,9 +457,11 @@ export default function StudentSidebar() {
           >
             <div className="px-4 pt-4">
               <div className="flex items-center gap-3 rounded-xl p-1">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#B45A2A] text-xs font-medium text-white">
-                  {userInitials}
-                </div>
+                <ProfileAvatar
+                  name={userName}
+                  profileImage={user?.profileImage}
+                  className="h-8 w-8 text-xs"
+                />
 
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-white">
@@ -597,9 +592,7 @@ export default function StudentSidebar() {
             collapsed ? "justify-center p-2" : "gap-3 p-3"
           }`}
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#B45A2A] text-sm font-serif text-white">
-            {userInitials}
-          </div>
+          <ProfileAvatar name={userName} profileImage={user?.profileImage} />
 
           {!collapsed && (
             <div className="min-w-0 flex-1">
@@ -618,9 +611,11 @@ export default function StudentSidebar() {
           <div className="absolute bottom-full left-4 z-[100] mb-2 w-[253px] overflow-hidden rounded-[20px] bg-[#363636] text-white shadow-2xl">
             <div className="px-4 pt-4">
               <div className="flex items-center gap-3 rounded-xl p-1">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#B45A2A] text-xs font-medium text-white">
-                  {userInitials}
-                </div>
+                <ProfileAvatar
+                  name={userName}
+                  profileImage={user?.profileImage}
+                  className="h-8 w-8 text-xs"
+                />
 
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-white">

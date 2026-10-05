@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { apiFetch } from "@/lib/api";
+import ProfileAvatar from "@/components/ui/ProfileAvatar";
 
 const SIDEBAR_STORAGE_KEY = "teacher-sidebar-collapsed";
 
@@ -16,6 +17,7 @@ type TeacherProfileResponse = {
     name: string;
     username: string;
     email: string;
+    profileImage?: string | null;
     status: string;
     createdAt: string;
     teacherProfile: {
@@ -321,16 +323,6 @@ export default function TeacherSidebar() {
   }, [router]);
 
   const displayedTeacherName = user?.name || teacherName;
-  const initials =
-    displayedTeacherName
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((word) => word[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() || "T";
-
   const handleLogout = logout;
 
   return (
@@ -509,9 +501,10 @@ export default function TeacherSidebar() {
           >
             <div className="px-4 pt-4">
               <div className="flex items-center gap-3 rounded-xl p-1">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#B45A2A] text-sm font-medium text-white">
-                  {initials}
-                </div>
+                <ProfileAvatar
+                  name={displayedTeacherName}
+                  profileImage={user?.profileImage}
+                />
 
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-white">
@@ -573,9 +566,10 @@ export default function TeacherSidebar() {
             collapsed ? "justify-center p-2" : "gap-3 p-3"
           }`}
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#B45A2A] font-serif text-sm text-white">
-            {initials}
-          </div>
+          <ProfileAvatar
+            name={displayedTeacherName}
+            profileImage={user?.profileImage}
+          />
 
           {!collapsed && (
             <div className="min-w-0 flex-1">

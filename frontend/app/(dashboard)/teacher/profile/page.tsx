@@ -2,6 +2,8 @@
 
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
+import ProfileAvatar from "@/components/ui/ProfileAvatar";
 
 type Profile = {
   name: string;
@@ -18,6 +20,7 @@ type TeacherProfileResponse = {
     name: string;
     username: string;
     email: string;
+    profileImage?: string | null;
     status: string;
     createdAt: string;
     teacherProfile?: {
@@ -31,6 +34,15 @@ type TeacherProfileResponse = {
   };
 };
 
+type ProfileImageResponse = {
+  success: boolean;
+  message?: string;
+  user: { profileImage?: string | null };
+};
+
+const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024;
+const PROFILE_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
 const initialProfile: Profile = {
   name: "",
   username: "",
@@ -40,6 +52,7 @@ const initialProfile: Profile = {
 };
 
 export default function TeacherProfilePage() {
+  const { refreshUser } = useAuth();
   const [profile, setProfile] = useState<Profile>(initialProfile);
 
   const [formData, setFormData] = useState<Profile>(initialProfile);
@@ -47,6 +60,10 @@ export default function TeacherProfilePage() {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -58,7 +75,6 @@ export default function TeacherProfilePage() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [changingPassword, setChangingPassword] = useState(false);
-
 
   useEffect(() => {
     async function loadProfile() {
@@ -95,6 +111,7 @@ export default function TeacherProfilePage() {
 
         setProfile(loadedProfile);
         setFormData(loadedProfile);
+        setProfileImage(user?.profileImage ?? null);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load profile.",
@@ -107,6 +124,72 @@ export default function TeacherProfilePage() {
     loadProfile();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
+    };
+  }, [photoPreview]);
+
+  const clearPhotoSelection = () => {
+    setSelectedPhoto(null);
+    setPhotoPreview(null);
+  };
+
+  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    setMessage("");
+    setError("");
+
+    if (!file) return;
+    if (!PROFILE_IMAGE_TYPES.has(file.type)) {
+      clearPhotoSelection();
+      setError("Choose a JPEG, PNG, or WebP image.");
+      return;
+    }
+    if (file.size > MAX_PROFILE_IMAGE_SIZE) {
+      clearPhotoSelection();
+      setError("Profile photo must be 5 MB or smaller.");
+      return;
+    }
+
+    setSelectedPhoto(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const handlePhotoUpload = async () => {
+    if (!selectedPhoto) {
+      setError("Choose a photo before uploading.");
+      return;
+    }
+
+    const token = localStorage.getItem("scm_token");
+    if (!token) {
+      setError("Authentication required. Please log in again.");
+      return;
+    }
+
+    try {
+      setUploadingPhoto(true);
+      setMessage("");
+      setError("");
+      const body = new FormData();
+      body.append("image", selectedPhoto);
+      const response = await apiFetch<ProfileImageResponse>(
+        "/auth/me/profile-image",
+        { method: "PUT", token, body },
+      );
+
+      setProfileImage(response.user.profileImage ?? null);
+      clearPhotoSelection();
+      await refreshUser();
+      setMessage("Profile photo updated successfully.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to upload photo.");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   const handleEdit = () => {
     setFormData(profile);
@@ -115,14 +198,13 @@ export default function TeacherProfilePage() {
     setError("");
   };
 
-
   const handleCancel = () => {
     setFormData(profile);
     setEditing(false);
     setMessage("");
     setError("");
+    clearPhotoSelection();
   };
-
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -132,7 +214,6 @@ export default function TeacherProfilePage() {
       [name]: value,
     }));
   };
-
 
   const handleSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -213,7 +294,6 @@ export default function TeacherProfilePage() {
     }
   };
 
-
   const handlePasswordChange = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -289,15 +369,6 @@ export default function TeacherProfilePage() {
 
   const displayedProfile = editing ? formData : profile;
 
-  const initials =
-    displayedProfile.name
-      .split(" ")
-      .filter(Boolean)
-      .map((word) => word[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() || "T";
-
   return (
     <main className="min-h-screen bg-[#EAE6DC] p-5 sm:p-8">
       <div className="mb-8">
@@ -326,10 +397,36 @@ export default function TeacherProfilePage() {
 
       <section className="rounded-2xl bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <div className="relative">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[#B45A2A] font-serif text-3xl font-bold text-white shadow-md">
-              {initials}
-            </div>
+          <div className="relative flex flex-col items-start gap-3">
+            <ProfileAvatar
+              name={displayedProfile.name || "Teacher"}
+              profileImage={photoPreview || profileImage}
+              className="h-24 w-24 text-3xl shadow-md"
+            />
+            {editing && (
+              <div className="flex flex-wrap gap-2">
+                <label className="cursor-pointer rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50">
+                  {selectedPhoto ? "Change Photo" : "Choose Photo"}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handlePhotoChange}
+                    disabled={uploadingPhoto}
+                    className="sr-only"
+                  />
+                </label>
+                {selectedPhoto && (
+                  <button
+                    type="button"
+                    onClick={() => void handlePhotoUpload()}
+                    disabled={uploadingPhoto}
+                    className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {uploadingPhoto ? "Uploading..." : "Upload Photo"}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex-1">
@@ -467,7 +564,7 @@ export default function TeacherProfilePage() {
               <button
                 type="button"
                 onClick={handleCancel}
-                disabled={saving}
+                disabled={saving || uploadingPhoto}
                 className="rounded-xl border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Cancel
@@ -475,7 +572,7 @@ export default function TeacherProfilePage() {
 
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || uploadingPhoto}
                 className="rounded-xl bg-[#B45A2A] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#9f4d24] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {saving ? "Saving..." : "Save Changes"}

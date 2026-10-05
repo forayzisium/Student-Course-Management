@@ -136,6 +136,7 @@ export async function getMyTeacherProfile(userId: number) {
       name: true,
       username: true,
       email: true,
+      profileImage: true,
       status: true,
       createdAt: true,
 
@@ -510,6 +511,7 @@ export async function updateMyTeacherProfile(
         name: true,
         username: true,
         email: true,
+        profileImage: true,
         status: true,
       },
     });

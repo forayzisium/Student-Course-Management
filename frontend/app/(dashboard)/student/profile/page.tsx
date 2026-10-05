@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { apiFetch } from "@/lib/api";
+import ProfileAvatar from "@/components/ui/ProfileAvatar";
 
 type Profile = {
   firstName: string;
@@ -18,6 +19,7 @@ type StudentProfileResponse = {
     name: string;
     username: string;
     email: string;
+    profileImage?: string | null;
     studentProfile: {
       id: number;
       studentId: string;
@@ -28,6 +30,15 @@ type StudentProfileResponse = {
     };
   };
 };
+
+type ProfileImageResponse = {
+  success: boolean;
+  message?: string;
+  user: { profileImage?: string | null };
+};
+
+const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024;
+const PROFILE_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 type UpdateProfileResponse = {
   success: boolean;
@@ -61,6 +72,10 @@ export default function StudentProfile() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   const [profile, setProfile] = useState<Profile>(initialProfile);
 
@@ -71,7 +86,6 @@ export default function StudentProfile() {
   const [year, setYear] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
-
 
   useEffect(() => {
     async function loadProfile() {
@@ -120,6 +134,7 @@ export default function StudentProfile() {
 
         setEmail(data.email || "");
         setUsername(data.username || "");
+        setProfileImage(data.profileImage ?? null);
       } catch (err) {
         console.error("Failed to load student profile:", err);
 
@@ -132,6 +147,72 @@ export default function StudentProfile() {
     void loadProfile();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
+    };
+  }, [photoPreview]);
+
+  const clearPhotoSelection = () => {
+    setSelectedPhoto(null);
+    setPhotoPreview(null);
+  };
+
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    setSaved(false);
+    setError("");
+
+    if (!file) return;
+    if (!PROFILE_IMAGE_TYPES.has(file.type)) {
+      clearPhotoSelection();
+      setError("Choose a JPEG, PNG, or WebP image.");
+      return;
+    }
+    if (file.size > MAX_PROFILE_IMAGE_SIZE) {
+      clearPhotoSelection();
+      setError("Profile photo must be 5 MB or smaller.");
+      return;
+    }
+
+    setSelectedPhoto(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const handlePhotoUpload = async () => {
+    if (!selectedPhoto) {
+      setError("Choose a photo before uploading.");
+      return;
+    }
+
+    const token = localStorage.getItem("scm_token");
+    if (!token) {
+      setError("Authentication required");
+      return;
+    }
+
+    try {
+      setUploadingPhoto(true);
+      setSaved(false);
+      setError("");
+      const body = new FormData();
+      body.append("image", selectedPhoto);
+      const response = await apiFetch<ProfileImageResponse>(
+        "/auth/me/profile-image",
+        { method: "PUT", token, body },
+      );
+
+      setProfileImage(response.user.profileImage ?? null);
+      clearPhotoSelection();
+      await refreshUser();
+      setSaved(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to upload photo");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   const handleEdit = () => {
     setFormData(profile);
@@ -140,14 +221,13 @@ export default function StudentProfile() {
     setError("");
   };
 
-
   const handleCancel = () => {
     setFormData(profile);
     setIsEditing(false);
     setSaved(false);
     setError("");
+    clearPhotoSelection();
   };
-
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -160,7 +240,6 @@ export default function StudentProfile() {
     setSaved(false);
     setError("");
   };
-
 
   const handleSave = async () => {
     if (!formData.firstName.trim()) {
@@ -240,11 +319,6 @@ export default function StudentProfile() {
     }
   };
 
-  const initials =
-    `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`.toUpperCase() ||
-    "S";
-
-
   if (loading) {
     return (
       <main className="min-h-screen bg-[#EAE6DC] p-5 sm:p-8">
@@ -289,10 +363,36 @@ export default function StudentProfile() {
 
       <section className="rounded-2xl bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <div className="relative">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[#B45A2A] font-serif text-3xl font-bold text-white shadow-md">
-              {initials}
-            </div>
+          <div className="relative flex flex-col items-start gap-3">
+            <ProfileAvatar
+              name={`${profile.firstName} ${profile.lastName}`}
+              profileImage={photoPreview || profileImage}
+              className="h-24 w-24 text-3xl shadow-md"
+            />
+            {isEditing && (
+              <div className="flex flex-wrap gap-2">
+                <label className="cursor-pointer rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50">
+                  {selectedPhoto ? "Change Photo" : "Choose Photo"}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handlePhotoChange}
+                    disabled={uploadingPhoto}
+                    className="sr-only"
+                  />
+                </label>
+                {selectedPhoto && (
+                  <button
+                    type="button"
+                    onClick={() => void handlePhotoUpload()}
+                    disabled={uploadingPhoto}
+                    className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {uploadingPhoto ? "Uploading..." : "Upload Photo"}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex-1">
@@ -425,7 +525,7 @@ export default function StudentProfile() {
             <button
               type="button"
               onClick={handleCancel}
-              disabled={saving}
+              disabled={saving || uploadingPhoto}
               className="rounded-xl border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Cancel
@@ -434,7 +534,7 @@ export default function StudentProfile() {
             <button
               type="button"
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || uploadingPhoto}
               className="rounded-xl bg-[#B45A2A] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#9f4d24] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {saving ? "Saving..." : "Save Changes"}
