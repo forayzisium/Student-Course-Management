@@ -9,6 +9,11 @@ import AssignmentCard from "@/components/students/AssignmentCard";
 import { weightedGpa } from "@/lib/academic-metrics";
 import { apiFetch } from "@/lib/api";
 import {
+  announcementLabel,
+  announcementStyle,
+  CourseAnnouncement,
+} from "@/lib/announcements";
+import {
   getEnrolledCourses,
   type EnrollmentResponse,
 } from "@/lib/student-enrollments";
@@ -416,6 +421,7 @@ function isAbortError(error: unknown) {
 export default function StudentDashboard() {
   const [courses, setCourses] = useState<ApiCourse[]>([]);
   const [activities, setActivities] = useState<ApiActivity[]>([]);
+  const [announcements, setAnnouncements] = useState<CourseAnnouncement[]>([]);
 
   const [assignments, setAssignments] = useState<ApiAssignment[]>([]);
 
@@ -465,6 +471,7 @@ export default function StudentDashboard() {
           studentResponse,
           feesResponse,
           activityResponse,
+          announcementResponse,
         ] = await Promise.all([
           apiFetch<CoursesResponse>("/enrollments/my-courses", {
             token,
@@ -507,6 +514,10 @@ export default function StudentDashboard() {
             cache: "no-store",
             signal: controller.signal,
           }),
+          apiFetch<{ success: boolean; data: CourseAnnouncement[] }>(
+            "/announcements/my",
+            { token, cache: "no-store", signal: controller.signal },
+          ),
         ]);
 
         if (!mounted) return;
@@ -517,6 +528,7 @@ export default function StudentDashboard() {
           attendanceResponse,
           feesResponse,
           activityResponse,
+          announcementResponse,
         ]) {
           if (!response.success || !Array.isArray(response.data)) {
             throw new Error("Invalid dashboard response. Please try again.");
@@ -552,6 +564,7 @@ export default function StudentDashboard() {
         setFees(Array.isArray(feesResponse.data) ? feesResponse.data : []);
 
         setActivities(activityResponse.data || []);
+        setAnnouncements(announcementResponse.data || []);
         hasLoaded = true;
         setHasData(true);
         setLastUpdated(Date.now());
@@ -1137,6 +1150,60 @@ export default function StudentDashboard() {
             )}
           </section>
         </div>
+        <section className="mt-10">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900">
+                Recent Course Updates
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Latest announcements from your teachers.
+              </p>
+            </div>
+            <Link
+              href="/student/announcements"
+              className="shrink-0 text-sm font-semibold text-slate-700 transition hover:text-[#B45A2A]"
+            >
+              View all →
+            </Link>
+          </div>
+          {announcements.length === 0 ? (
+            <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+              <p className="font-serif text-sm text-slate-500">
+                No course announcements yet.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {announcements.slice(0, 3).map((item) => (
+                <article
+                  key={item.id}
+                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="text-sm font-semibold text-[#B45A2A]">
+                      {item.course.code}
+                    </p>
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${announcementStyle(item.type)}`}
+                    >
+                      {announcementLabel(item.type)}
+                    </span>
+                  </div>
+                  <h3 className="mt-3 font-semibold text-slate-900">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-500">
+                    {item.message}
+                  </p>
+                  <p className="mt-4 text-xs text-slate-400">
+                    {getRelativeTime(item.createdAt)}
+                  </p>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
         <section className="mt-10">
           <div className="mb-5 flex items-center justify-between">
             <div>

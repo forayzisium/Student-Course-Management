@@ -8,7 +8,8 @@ export type RealtimeEventType =
   | "PAYMENT_UPDATED"
   | "COURSE_CATALOG_UPDATED"
   | "ENROLLMENT_UPDATED"
-  | "PROFILE_UPDATED";
+  | "PROFILE_UPDATED"
+  | "ANNOUNCEMENT_UPDATED";
 
 export interface RealtimeEventPayload {
   type: RealtimeEventType;
